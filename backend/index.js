@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');  
 const app = express();
+require('dotenv').config(); 
 const PORT = process.env.PORT || 4000;
 
 // Middleware
@@ -12,7 +13,7 @@ app.use(express.json());
 app.use(cors());
 
 // MongoDB connection with updated options
-mongoose.connect('mongodb+srv://antonio:xI4Sc9y84@cluster0.8kp5ge7.mongodb.net/e-comm-api-db', {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
