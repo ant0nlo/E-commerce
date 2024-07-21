@@ -1,0 +1,61 @@
+.new-collections{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 90px;
+    margin-top: 180px;
+}
+
+.new-collections h1{
+    color: #171717;
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.new-collections hr{
+    width: 150px;
+    height: 4px;
+    border-radius: 10px;
+    background: #252525;
+}
+
+.collections{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    margin-top: 30px;
+    gap: 30px;
+}
+@media (max-width: 1024px) {
+    .new-collections h1 {
+        font-size: 2rem;
+    }
+
+    .new-collections hr {
+        width: 120px;
+        height: 3px;
+        border-radius: 4px;
+    }
+
+    .collections {
+        grid-template-columns: repeat(2, 1fr); /* Показва по 2 обекта на ред */
+        gap: 15px;
+    }
+}
+
+@media (max-width: 780px) {
+    .new-collections h1 {
+        font-size: 1.5rem;
+    }
+
+    .new-collections hr {
+        width: 100px;
+        height: 2px;
+        border-radius: 3px;
+    }
+
+    .collections {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+}

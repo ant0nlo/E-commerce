@@ -1,0 +1,137 @@
+.loginsighup {
+    width: 100%;
+    height: 100vh; /* Намалено за по-компактен дизайн */
+    background: #fce3fe;
+    padding-top: 50px; /* Намалено за по-компактен дизайн */
+    padding: 20px; /* Намалено за по-компактен дизайн */
+    box-sizing: border-box; /* Добавено за по-добра съвместимост */
+}
+
+.loginsighup-container {
+    width: 100%;
+    max-width: 500px; /* Намалено за по-компактен дизайн */
+    height: auto; /* Променено за автоматично адаптиране на височината */
+    background: white;
+    margin: auto;
+    margin-top: 50px;
+    padding: 10px 40px 50px 30px; /* Намалено за по-компактен дизайн */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Добавено за по-добър ефект */
+    border-radius: 8px; /* Добавено за по-добър вид */
+}
+
+.loginsighup-container h1 {
+    margin: 10px 0px; /* Намалено за по-компактен дизайн */
+    font-size: 24px; /* Добавено за по-добър вид */
+    text-align: center; /* Добавено за по-добър вид */
+}
+.loginsighup-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Намалено за по-компактен дизайн */
+    margin-top: 20px; /* Намалено за по-компактен дизайн */
+}
+
+.loginsighup-fields input {
+    height: 40px; /* Намалено за по-компактен дизайн */
+    width: 100%;
+    padding-left: 15px; /* Намалено за по-компактен дизайн */
+    border: 1px solid #c9c9c9;
+    outline: none;
+    color: #5c5c5c;
+    font-size: 16px; /* Намалено за по-компактен дизайн */
+    border-radius: 4px; /* Добавено за по-добър вид */
+}
+
+.loginsighup-container button {
+    width: 100%;
+    height: 50px; /* Намалено за по-компактен дизайн */
+    color: white;
+    background: #ff4141;
+    margin-top: 20px; /* Намалено за по-компактен дизайн */
+    border: none;
+    font-size: 20px; /* Намалено за по-компактен дизайн */
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px; /* Добавено за по-добър вид */
+}
+
+.loginsighup-login {
+    margin-top: 15px; /* Намалено за по-компактен дизайн */
+    color: #5c5c5c;
+    font-size: 16px; /* Намалено за по-компактен дизайн */
+    font-weight: 500;
+    text-align: center; /* Добавено за по-добър вид */
+}
+
+.loginsighup-login span {
+    color: #ff4141;
+    font-weight: 500;
+    cursor: pointer; /* Добавено за по-добър вид */
+}
+
+.loginsighup-agree {
+    display: flex;
+    align-items: center;
+    margin-top: 20px; /* Намалено за по-компактен дизайн */
+    gap: 10px; /* Намалено за по-компактен дизайн */
+    color: #5c5c5c;
+    font-size: 14px; /* Намалено за по-компактен дизайн */
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .loginsighup-container {
+        padding: 20px; /* Променено за по-добър вид на малки екрани */
+    }
+
+    .loginsighup-fields input {
+        height: 35px; /* Намалено за по-компактен дизайн */
+        font-size: 14px; /* Намалено за по-компактен дизайн */
+    }
+
+    .loginsighup-container button {
+        height: 45px; /* Намалено за по-компактен дизайн */
+        font-size: 18px; /* Намалено за по-компактен дизайн */
+    }
+
+    .loginsighup-login {
+        font-size: 14px; /* Намалено за по-компактен дизайн */
+    }
+
+    .loginsighup-agree {
+        font-size: 12px; /* Намалено за по-компактен дизайн */
+    }
+}
+
+@media (max-width: 480px) {
+    .loginsighup {
+        padding: 10px; /* Променено за по-добър вид на много малки екрани */
+    }
+
+    .loginsighup-container {
+        padding: 15px; /* Променено за по-добър вид на много малки екрани */
+    }
+
+    .loginsighup-fields {
+        gap: 10px; /* Променено за по-добър вид на много малки екрани */
+    }
+
+    .loginsighup-fields input {
+        height: 30px; /* Намалено за по-компактен дизайн */
+        font-size: 12px; /* Намалено за по-компактен дизайн */
+    }
+
+    .loginsighup-container button {
+        height: 40px; /* Намалено за по-компактен дизайн */
+        font-size: 16px; /* Намалено за по-компактен дизайн */
+    }
+
+    .loginsighup-login {
+        font-size: 12px; /* Намалено за по-компактен дизайн */
+    }
+
+    .loginsighup-agree {
+        font-size: 10px; /* Намалено за по-компактен дизайн */
+    }
+}
