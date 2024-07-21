@@ -1,5 +1,5 @@
 
-# E-Commerce Frontend
+# E-Commerce App
 
 ## Description
 This project is an e-commerce web application. It is built with modern web technologies to provide a seamless shopping experience for users.
