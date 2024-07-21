@@ -2,7 +2,7 @@
 # E-Commerce Frontend
 
 ## Description
-This project is the frontend of an e-commerce web application. It is built with modern web technologies to provide a seamless shopping experience for users.
+This project is an e-commerce web application. It is built with modern web technologies to provide a seamless shopping experience for users.
 
 ## Table of Contents
 - [Installation](#installation)
