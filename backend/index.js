@@ -21,7 +21,7 @@ mongoose.connect(process.env.MONGO_URI, {
  .catch(err => console.log(err));
 
 app.get('/', (req,res)=>[
-  req.send('Express app is running...')
+  res.send('Succssesfuly connected...')
 ])
 
 // Image Storage Engine
