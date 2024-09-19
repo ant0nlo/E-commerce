@@ -43,40 +43,40 @@ Follow these steps to set up and run the project locally on your computer.
 
 ### Navigating And Installing Dependencies
 
-1. git clone https://github.com/ant0nlo/E-commerce.git
-2. cd E-commerce
-3. cd frontend
-4. npm install
-5. cd ../backend
-6. npm install
+- git clone https://github.com/ant0nlo/E-commerce.git
+- cd E-commerce
+- cd frontend
+- npm install
+- cd ../backend
+- npm install
 
 ### Setting Up Environment Variables
-- Create a .env file for both frontend and backend, and add the necessary variables.
- 1. Backend .env:
-    PORT=5000
-    MONGO_URI=your_mongodb_connection_string
-    JWT_SECRET=your_jwt_secret
-    STRIPE_SECRET_KEY=your_stripe_secret_key
- 2. Frontend .env:
-    REACT_APP_API_URL=http://localhost:5000/api
-    REACT_APP_STRIPE_PUBLIC_KEY=your_stripe_public_key
+**Create a .env file for both frontend and backend, and add the necessary variables.**
+- **Backend .env:** <br /> 
+PORT=5000 <br /> 
+MONGO_URI=your_mongodb_connection_string <br /> 
+JWT_SECRET=your_jwt_secret <br /> 
+STRIPE_SECRET_KEY=your_stripe_secret_key <br /> 
+- **Frontend .env:** <br /> 
+REACT_APP_API_URL=http://localhost:5000/api <br /> 
+REACT_APP_STRIPE_PUBLIC_KEY=your_stripe_public_key
 
 ### Running the Application
-1. cd backend
-2. npm start
-3. cd frontend
-4. npm start
+- cd backend
+- npm start
+- cd frontend
+- npm start
 
 ### Running the Admin Panel
--**The Admin Panel provides a user-friendly interface for administrators to manage products in the database. It allows adding new products, editing existing ones, and deleting products seamlessly without direct database interaction.**
+**The Admin Panel provides a user-friendly interface for administrators to manage products in the database. It allows adding new products, editing existing ones, and deleting products seamlessly without direct database interaction.**
 - cd admin
 - npm start
 
--**Admin Features**
--Add New Products
--Edit Existing Products:
--Delete Products
--Manage Categories
+- **Admin Features**
+- Add New Products
+- Edit Existing Products:
+- Delete Products
+- Manage Categories
 
 ## Usage
 - Open your web browser and navigate to `http://localhost:3000` to view the application.
