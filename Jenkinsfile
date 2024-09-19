@@ -1,23 +1,45 @@
 pipeline {
-    agent {
-        docker {
-            image 'ecommbackend'
-            args '--network e-comm-network'
-        }
-    }
+    agent any
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
+                // Клонирайте вашето репо
+                git 'https://github.com/your-repo.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                // Инсталирайте зависимости
+                script {
+                    def node = tool name: 'NodeJS', type: 'NodeJSInstallation'
+                    env.PATH = "${node}/bin:${env.PATH}"
+                }
                 sh 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                // Стартирайте тестовете
                 sh 'npm test'
             }
-        }
-        stage('Deploy') {
-            steps {
-                script {
-                    // Deploy steps
+            post {
+                always {
+                    // Записва тестовите резултати
+                    junit 'test-results/*.xml'
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build and tests successful!'
+        }
+        failure {
+            echo 'Build or tests failed.'
         }
     }
 }
