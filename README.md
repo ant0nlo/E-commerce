@@ -51,7 +51,7 @@ Follow these steps to set up and run the project locally on your computer.
 6. npm install
 
 ###Setting Up Environment Variables
-Create a .env file for both frontend and backend, and add the necessary variables.
+- Create a .env file for both frontend and backend, and add the necessary variables.
  1. Backend .env:
     PORT=5000
     MONGO_URI=your_mongodb_connection_string
@@ -67,8 +67,20 @@ Create a .env file for both frontend and backend, and add the necessary variable
 3. cd frontend
 4. npm start
 
+###Running the Admin Panel
+-**The Admin Panel provides a user-friendly interface for administrators to manage products in the database. It allows adding new products, editing existing ones, and deleting products seamlessly without direct database interaction.**
+- cd admin
+- npm start
+
+-**Admin Features**
+-Add New Products
+-Edit Existing Products:
+-Delete Products
+-Manage Categories
+
 ## Usage
 - Open your web browser and navigate to `http://localhost:3000` to view the application.
+- The Admin Panel will be accessible at `http://localhost:3001` (If port 3001 is in use, you might need to specify a different port.)
 
 ## Features
 - User Authentication
