@@ -1,7 +1,5 @@
 # E-commerce Project
 
-![E-commerce Banner](/frontend/src/components/Assets/bag_logo2.png)
-
 ## Description
 
 Welcome to our **E-commerce** project, built with **React**! This website offers comprehensive online shopping functionality, including product browsing, cart management, user profile management, and more. Our goal is to create an intuitive and enjoyable user experience while providing a flexible and scalable architecture for developers.
