@@ -1,6 +1,6 @@
 # E-commerce Project
 
-![E-commerce Banner](https://your-image-link.com/banner.png)
+![E-commerce Banner](/frontend/src/components/Assets/bag_logo2.png)
 
 ## Description
 
