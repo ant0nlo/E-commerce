@@ -50,7 +50,7 @@ Follow these steps to set up and run the project locally on your computer.
 5. cd ../backend
 6. npm install
 
-###Setting Up Environment Variables
+### Setting Up Environment Variables
 - Create a .env file for both frontend and backend, and add the necessary variables.
  1. Backend .env:
     PORT=5000
@@ -61,13 +61,13 @@ Follow these steps to set up and run the project locally on your computer.
     REACT_APP_API_URL=http://localhost:5000/api
     REACT_APP_STRIPE_PUBLIC_KEY=your_stripe_public_key
 
-###Running the Application
+### Running the Application
 1. cd backend
 2. npm start
 3. cd frontend
 4. npm start
 
-###Running the Admin Panel
+### Running the Admin Panel
 -**The Admin Panel provides a user-friendly interface for administrators to manage products in the database. It allows adding new products, editing existing ones, and deleting products seamlessly without direct database interaction.**
 - cd admin
 - npm start
