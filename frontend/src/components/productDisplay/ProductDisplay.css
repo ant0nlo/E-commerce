@@ -88,7 +88,7 @@
     font-size: 16px;
     font-weight: 600;
     color: white;
-    background: #ff4141;
+    background: #fd742f;
     border: none;
     outline: none;
     cursor: pointer;
@@ -102,6 +102,32 @@
 .productdisplay-right-category span {
     font-weight: 600;
 }
+
+/* ProductDisplay.css */
+
+.productdisplay-right-sizes {
+    display: flex;
+    gap: 10px;
+}
+
+.size-option {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.size-option:hover {
+    background-color: #f0f0f0;
+}
+
+.size-option.selected {
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
+}
+
 
 /* Media Queries for Responsive Design */
 

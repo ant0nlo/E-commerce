@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import './Offers.css'
 import exclusive_image from '../Assets/exclusive_image.png'
 const Offers = () => {
@@ -6,9 +7,9 @@ const Offers = () => {
     <div className='offers'>
         <div className="offers-left">
             <h1>Exclusive</h1>
-            <h1>Offers For You</h1>
+            <h1>Offers For Women</h1>
             <p>ONLY ON BEST SELLERS PRODUCTS</p>
-            <button>Check Now</button>
+            <Link to='/womens' style={{textDecoration: 'none', color: 'inherit'}}> <button>Check Now</button> </Link>
         </div>
         <div className="offers-right">
             <img src={exclusive_image} alt="" />

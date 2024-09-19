@@ -17,10 +17,10 @@
 }
 
 .banner {
-    width: 87%;
+    width: 1050px;
     max-width: 1200px;
-    height: auto;
-    margin-top: -130px;
+    height: 385px;
+    margin-top: -170px;
     margin-bottom: -65px;
 
 }

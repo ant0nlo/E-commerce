@@ -1,47 +1,97 @@
-.shopcategory-banner{
+/* ShopCategory.css */
+
+.shopcategory-banner {
     display: block;
     margin: 50px auto;
     width: 82%;
 }
 
-.shopcategory-indexSort{
+.shopcategory-indexSort {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin: 0px 150px;
 }
 
-.shopcategory-sort{
+.shopcategory-sort {
+    display: flex;
+    align-items: center;
     padding: 10px 20px;
     border-radius: 40px;
     border: 1px solid #888;
-    margin-right: 5px;
-
+    margin-right: 10px;
+    background-color: #fff;
+    position: relative;
 }
 
-.shopcategory-indexSort p span{
+.shopcategory-sort select {
+    appearance: none; /* Премахване на стандартния вид на select */
+    background: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding-right: 30px; /* Допълнително пространство за иконата */
+}
+
+.shopcategory-sort img {
+    position: absolute;
+    right: 10px;
+    pointer-events: none; /* Иконата не пречи на кликовете */
+}
+
+.shopcategory-indexSort p span {
     font-weight: 600;
-    margin-left: -15px;
+    margin-left: 5px; /* Коригирано разстояние */
 }
 
-.shopcategory-products{
+.shopcategory-products {
     margin: 20px 150px;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Респонсивна мрежа */
     gap: 15px;
     row-gap: 80px;
 }
 
-.shopcategory-loadmore{
+.shopcategory-loadmore {
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 110px auto;
+}
+
+.shopcategory-loadmore button {
     width: 233px;
     height: 69px;
     border-radius: 75px;
     background: #ededed;
-    color: #787878;
+    color: black;
     font-size: 18px;
     font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+}
+
+.shopcategory-loadmore button:hover {
+    background: #ccc;
+    color: #555;
+}
+
+/* Допълнителни стилове за сортиращото меню */
+.shopcategory-sort select {
+    padding: 10px 0; /* Вертикално подравняване */
+    margin-left: 10px;
+    margin-top: 1px;
+
+}
+
+.shopcategory-sort {
+    width: 200px; /* Фиксирана ширина за сортиращото меню */
+}
+
+.shopcategory-loadmore button:disabled {
+    background: #f0f0f0;
+    color: #aaa;
+    cursor: not-allowed;
 }

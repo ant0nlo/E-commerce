@@ -1,97 +1,122 @@
+// ShopContext.js
 import React, { createContext, useEffect, useState } from "react";
+
 export const ShopContext = createContext(null);
 
-const getDefaultCart = () =>{
-    let cart = {};
-    for (let index = 0; index < 300 + 1; index++) {
-        cart[index] = 0;
-        
-    }
-    return cart
+// Инициализиране на количката като празен обект
+const getDefaultCart = () => {
+    return {}; // Празен обект, тъй като размерите ще се добавят динамично
 }
 
-const ShopContextProvider = (props) =>{
-    const [all_product, set_all_product] = useState([])
-    const [cartItems, setCartItems] = useState(getDefaultCart())
+const ShopContextProvider = (props) => {
+    const [all_product, set_all_product] = useState([]);
+    const [cartItems, setCartItems] = useState(getDefaultCart());
 
-    useEffect(()=>{
+    useEffect(() => {
+        // Вземане на всички продукти от backend
         fetch('http://localhost:4000/allproducts')
-        .then((res)=>res.json())
-        .then((data)=>set_all_product(data))
+            .then((res) => res.json())
+            .then((data) => set_all_product(data))
+            .catch((error) => console.error("Error fetching products:", error));
 
+        // Вземане на количката, ако потребителят е логнат
+        const token = localStorage.getItem('auth-token');
+        if (token) {
+            fetch('http://localhost:4000/getcart', {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json', // Поправен хедър
+                    'Content-Type': 'application/json',
+                    'auth-token': token,
+                },
+                body: JSON.stringify({}) // Изпращане на празен обект
+            })
+            .then((res) => res.json())
+            .then((data) => setCartItems(data))
+            .catch((error) => console.error("Error fetching cart:", error));
+        }
+    }, []);
+
+    // Функция за добавяне на продукт в количката с размер
+    const addToCart = (itemId, size) => {
+        const cartKey = `${itemId}-${size}`; // Комбинация от itemId и size
+        setCartItems((prev) => ({
+            ...prev,
+            [cartKey]: (prev[cartKey] || 0) + 1
+        }));
         if (localStorage.getItem('auth-token')) {
-            fetch('http://localhost:4000/getcart',{
-            method:"POST",
-            headers:{
-                Accept:"application/form-data",
-                "auth-token":`${localStorage.getItem('auth-token')}`,
-                "Content-Type": "application/json",
-
-            },
-            body:""
-        })
-        .then((res)=>res.json())
-        .then((data)=>setCartItems(data))
-        }
-    },[])
-
-    const addToCart = (itemId) => {
-        setCartItems((prev)=>({...prev, [itemId]:prev[itemId]+1}))
-        if(localStorage.getItem('auth-token')){
-            fetch('http://localhost:4000/addtocart',{
-                method:"POST",
-                headers:{
-                    Accept:"application/form-data",
-                    "auth-token":`${localStorage.getItem('auth-token')}`,
-                    "Content-Type": "application/json",
-
+            fetch('http://localhost:4000/addtocart', {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json', // Поправен хедър
+                    'Content-Type': 'application/json',
+                    'auth-token': `${localStorage.getItem('auth-token')}`,
                 },
-                body:JSON.stringify({"itemId":itemId})
+                body: JSON.stringify({ "itemId": itemId, "size": size })
             })
-            .then((res)=>res.json())
-            .then((data)=>console.log(data))
+            .then((res) => res.json())
+            .then((data) => console.log("Add to cart response:", data))
+            .catch((error) => console.error("Error adding to cart:", error));
         }
     }
 
-    const removeFromCart = (itemId) => {
-        setCartItems((prev)=>({...prev, [itemId]:prev[itemId]-1}))
-        if(localStorage.getItem('auth-token')){
-            fetch('http://localhost:4000/removefromcart',{
-                method:"POST",
-                headers:{
-                    Accept:"application/form-data",
-                    "auth-token":`${localStorage.getItem('auth-token')}`,
-                    "Content-Type": "application/json",
-
+    // Функция за премахване на продукт от количката с размер
+    const removeFromCart = (itemId, size) => {
+        const cartKey = `${itemId}-${size}`; // Комбинация от itemId и size
+        setCartItems((prev) => ({
+            ...prev,
+            [cartKey]: (prev[cartKey] || 0) - 1
+        }));
+        if (localStorage.getItem('auth-token')) {
+            fetch('http://localhost:4000/removefromcart', {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json', // Поправен хедър
+                    'Content-Type': 'application/json',
+                    'auth-token': `${localStorage.getItem('auth-token')}`,
                 },
-                body:JSON.stringify({"itemId":itemId})
+                body: JSON.stringify({ "itemId": itemId, "size": size })
             })
-            .then((res)=>res.json())
-            .then((data)=>console.log(data))
+            .then((res) => res.json())
+            .then((data) => console.log("Remove from cart response:", data))
+            .catch((error) => console.error("Error removing from cart:", error));
         }
     }
 
+    // Функция за изчисляване на общата сума в количката
     const getTotalCartAmount = () => {
         let totalAmount = 0;
-        for (const item in cartItems) {
-          if (cartItems[item] > 0) {
-            let itemInfo = all_product.find((product) => product.id === Number(item));
-            totalAmount += itemInfo.new_price * cartItems[item];
-          }
-        }
-        return totalAmount;
-      };
-    const getTotalCartItems = () => {
-        let totalItem = 0
-        for(const item in cartItems){
-            if(cartItems[item]>0){
-                totalItem += cartItems[item]
+        for (const cartKey in cartItems) {
+            if (cartItems[cartKey] > 0) {
+                const [itemId, size] = cartKey.split('-');
+                const itemInfo = all_product.find((product) => product.id === Number(itemId));
+                if (itemInfo) {
+                    totalAmount += itemInfo.new_price * cartItems[cartKey];
+                }
             }
         }
-        return totalItem
+        return totalAmount;
+    };
+
+    // Функция за изчисляване на общия брой продукти в количката
+    const getTotalCartItems = () => {
+        let totalItem = 0;
+        for (const cartKey in cartItems) {
+            if (cartItems[cartKey] > 0) {
+                totalItem += cartItems[cartKey];
+            }
+        }
+        return totalItem;
     }
 
-    const contextValue = {getTotalCartItems, getTotalCartAmount, all_product, cartItems, addToCart, removeFromCart}
+    const contextValue = { 
+        getTotalCartItems, 
+        getTotalCartAmount, 
+        all_product, 
+        cartItems, 
+        addToCart, 
+        removeFromCart 
+    }
 
     return (
         <ShopContext.Provider value={contextValue}>

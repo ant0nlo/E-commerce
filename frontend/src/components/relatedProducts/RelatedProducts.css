@@ -4,17 +4,18 @@
     align-items: center;
     gap: 10px;
     padding: 50px 0;
+    margin-top: -100px;
 }
 
 .relatedproducts h1 {
     color: #171717;
-    font-size: 50px;
-    font-weight: 600;
+    font-size: 30px;
+    font-weight: 500;
 }
 
 .relatedproducts hr {
     width: 200px;
-    height: 6px;
+    height: 2px;
     border-radius: 10px;
     background: #252525;
 }
@@ -29,19 +30,10 @@
 
 /* Media Queries for Responsive Design */
 
-@media screen and (max-width: 1280px) {
-    .relatedproducts h1 {
-        font-size: 40px;
-    }
-
-    .relatedproducts-item {
-        gap: 20px;
-    }
-}
-
 @media screen and (max-width: 1024px) {
     .relatedproducts h1 {
-        font-size: 35px;
+        font-size: 25px;
+        margin-top: 20px;
     }
 
     .relatedproducts hr {
@@ -56,11 +48,12 @@
 
 @media screen and (max-width: 768px) {
     .relatedproducts {
-        padding: 30px 0;
+        padding: 25px 0;
+        margin-top: 20px;
     }
 
     .relatedproducts h1 {
-        font-size: 30px;
+        font-size: 25px;
     }
 
     .relatedproducts hr {
@@ -73,8 +66,9 @@
 }
 
 @media screen and (max-width: 480px) {
+
     .relatedproducts h1 {
-        font-size: 24px;
+        font-size: 25px;
     }
 
     .relatedproducts hr {
