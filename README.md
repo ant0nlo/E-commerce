@@ -72,7 +72,7 @@ REACT_APP_STRIPE_PUBLIC_KEY=your_stripe_public_key
 - cd admin
 - npm start
 
-- **Admin Features**
+**Admin Features**
 - Add New Products
 - Edit Existing Products:
 - Delete Products
