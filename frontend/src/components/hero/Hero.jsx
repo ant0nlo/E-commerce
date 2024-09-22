@@ -7,9 +7,8 @@ const Hero = () => {
     <div className='hero'>
         <div className="hero-left">
             <div>
-            <img className='banner' src={banner} alt="" />
-            </div>
-            
+                <img className='banner' src={banner} alt="" />
+            </div>  
         </div>
     </div>
   )

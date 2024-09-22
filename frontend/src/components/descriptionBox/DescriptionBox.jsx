@@ -18,9 +18,6 @@ const DescriptionBox = () => {
                   interface and user-friendly navigation, finding your desired items has never
                   been easier. We pride ourselves on our vast selection of high-quality products, 
                   ranging from the latest tech gadgets to fashionable apparel and home essentials.</p>
-                <p>
-
-                </p>
         </div>
     </div>
   )

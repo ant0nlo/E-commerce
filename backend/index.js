@@ -89,7 +89,8 @@ app.post('/addproduct', async (req, res) => {
     let items = await Item.find({});
     let id;
     if (items.length > 0) {
-      let last_item = items[items.length - 1];
+      let last_item_arr = items.slice(-1)
+      let last_item = last_item_arr[0]
       id = last_item.id + 1;
     } else {
       id = 1;
@@ -105,6 +106,7 @@ app.post('/addproduct', async (req, res) => {
     });
     
     console.log(product);
+    
     await product.save();
     console.log("Saved");
     res.json({
@@ -208,9 +210,9 @@ app.post('/signup', async (req, res) => {
 
     // Инициализиране на cartData с 100 артикула, всички зададени на 0
     let cart = {};
-    for (let i = 0; i < 100; i++) {
+   /*  for (let i = 0; i < 100; i++) {
       cart[i.toString()] = 0; // Ключовете са низове
-    }
+    } */
 
     const user = new Users({
       name: username,
@@ -327,7 +329,6 @@ app.post('/addtocart', fetchUser, async (req, res) => {
           return res.status(400).json({ errors: "Invalid item ID" });
       }
 
-      // Опционално: Проверка дали size е валиден
       const validSizes = ['S', 'M', 'L', 'XL', 'XXL'];
       if (!validSizes.includes(sizeStr)) {
           return res.status(400).json({ errors: "Invalid size selected" });
@@ -352,45 +353,52 @@ app.post('/addtocart', fetchUser, async (req, res) => {
   }
 });
 
-
-// Създаване на endpoint за премахване на продукт от cartData
+// Endpoint за премахване на продукт от cartData
 app.post('/removefromcart', fetchUser, async (req, res) => {
   try {
-    const { itemId } = req.body;
-    if (itemId === undefined) {
-      return res.status(400).json({ errors: "Item ID is required" });
-    }
+      const { itemId, size } = req.body;
+      if (itemId === undefined || !size) {
+          return res.status(400).json({ errors: "Item ID and size are required" });
+      }
 
-    const itemIdStr = itemId.toString(); // Конвертиране към низ
+      const itemIdStr = itemId.toString();
+      const sizeStr = size.toString().toUpperCase();
 
-    // Проверка дали itemId е валиден
-    const itemExists = await Item.findOne({ id: Number(itemIdStr) });
-    if (!itemExists) {
-      return res.status(400).json({ errors: "Invalid item ID" });
-    }
+      // Проверка дали itemId и size са валидни
+      const itemExists = await Item.findOne({ id: Number(itemIdStr) });
+      if (!itemExists) {
+          return res.status(400).json({ errors: "Invalid item ID" });
+      }
 
-    // Намаляване на количеството само ако е > 0
-    const user = await Users.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ errors: "User not found" });
-    }
+      const validSizes = ['S', 'M', 'L', 'XL', 'XXL'];
+      if (!validSizes.includes(sizeStr)) {
+          return res.status(400).json({ errors: "Invalid size selected" });
+      }
 
-    const currentQty = user.cartData.get(itemIdStr) || 0;
-    if (currentQty > 0) {
-      const updatedUser = await Users.findByIdAndUpdate(
-        req.user.id,
-        { $inc: { [`cartData.${itemIdStr}`]: -1 } },
-        { new: true }
-      );
-      res.json({ success: true, cartData: updatedUser.cartData });
-    } else {
-      res.status(400).json({ errors: "Item quantity is already zero" });
-    }
+      // Намаляване на количеството само ако е > 0
+      const user = await Users.findById(req.user.id);
+      if (!user) {
+          return res.status(404).json({ errors: "User not found" });
+      }
+
+      const cartKey = `${itemIdStr}-${sizeStr}`;
+      const currentQty = user.cartData.get(cartKey) || 0;
+      if (currentQty > 0) {
+          const updatedUser = await Users.findByIdAndUpdate(
+              req.user.id,
+              { $inc: { [`cartData.${cartKey}`]: -1 } },
+              { new: true }
+          );
+          res.json({ success: true, cartData: Object.fromEntries(updatedUser.cartData) });
+      } else {
+          return res.status(400).json({ errors: "Item quantity is already zero" });
+      }
   } catch (error) {
-    console.error("Error removing from cart:", error);
-    res.status(500).json({ errors: "Failed to remove from cart" });
+      console.error("Error removing from cart:", error);
+      res.status(500).json({ errors: "Failed to remove from cart" });
   }
 });
+
 
 // Създаване на endpoint за получаване на cartData
 app.post('/getcart', fetchUser, async (req, res) => {
@@ -401,6 +409,7 @@ app.post('/getcart', fetchUser, async (req, res) => {
       res.status(404).send({ errors: "User not found" });
     } else {
       res.json(Object.fromEntries(userData.cartData)); // Конвертиране от Map към Object
+      
     }
   } catch (error) {
     console.error("Error getting cart:", error);

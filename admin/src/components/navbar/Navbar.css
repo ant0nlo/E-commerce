@@ -1,29 +1,42 @@
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  margin-top: -10px;
+  font-family: 'Open Sans';
+
+}
+
+.nav-logo-text {
+  display: flex;
+  align-items: center;
+  color: #171717;
+  font-weight: 500;
+  font-size: 1.3rem;
+}
+
+.nav-logo {
+  width: 100px;
+}
+
+.nav-profile {
+  width: 65px;
+}
+
+@media (max-width: 800px) {
+  .navbar {
+      padding: 15px 30px;
   }
-  
   .nav-logo {
-    width: 200px;
+      width: 80px; /* Променено за по-малки екрани */
   }
-  
+  .nav-text {
+      font-size: 1.2rem; /* Променено за по-малки екрани */
+  }
   .nav-profile {
-    width: 65px;
+      width: 50px;
   }
-
-  @media(max-width:800px){
-    .navbar{
-        padding: 15px 30px;
-    }
-    .nav-logo{
-        padding: 150px;
-    }
-    .nav-profile{
-        padding: 60px;
-    }
-  }
-
+}

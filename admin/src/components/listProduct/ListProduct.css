@@ -8,12 +8,15 @@
     margin: 30px;
     border-radius: 6px;
     
+    
   }
   
   .list-product h1 {
     margin-top: -15px;
     margin-bottom: 25px;
     color: #333;
+    font-family: 'Open Sans';
+
   }
   
   .listproduct-format-main {

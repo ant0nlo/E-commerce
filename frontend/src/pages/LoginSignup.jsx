@@ -10,7 +10,7 @@ const LoginSignup = () => {
     email:"",
   })
   
-  const [isChecked, setIsChecked] = useState(false); // Добавено състояние за чекбокса
+  const [isChecked, setIsChecked] = useState(false);
 
   const changeHandle= (e)=>{
     setFormData({...formData, [e.target.name]:e.target.value})
