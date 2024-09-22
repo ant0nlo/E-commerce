@@ -1,44 +1,84 @@
-
-# E-Commerce App
+# E-commerce Project
 
 ## Description
-This project is an e-commerce web application. It is built with modern web technologies to provide a seamless shopping experience for users.
 
-## Table of Contents
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
+Welcome to our **E-commerce** project, built with **React**! This website offers comprehensive online shopping functionality, including product browsing, cart management, user profile management, and more. Our goal is to create an intuitive and enjoyable user experience while providing a flexible and scalable architecture for developers.
+
+## Features
+
+- **Product Browsing:** Explore various product categories with detailed descriptions and images.
+- **Search and Filtering:** Easily find products using keyword search and filters by category, price, and more.
+- **Add to Cart:** Add products to your cart and manage quantities.
+- **User Profile Management:** Register and log in with user profiles, and manage your orders.
+- **Reviews and Ratings:** Leave reviews and ratings for products.
+- **Payment and Orders:** Secure payment processing and order tracking.
+
+## Technologies Used
+
+- **Frontend:**
+  - [React](https://reactjs.org/) - Library for building user interfaces.
+  - [React Router](https://reactrouter.com/) - For managing application navigation.
+  - [Redux](https://redux.js.org/) - For managing global state.
+  - [Sass](https://sass-lang.com/) - For styling components.
+  
+- **Backend:**
+  - [Node.js](https://nodejs.org/) - JavaScript runtime for server-side development.
+  - [Express.js](https://expressjs.com/) - Web framework for Node.js.
+  - [MongoDB](https://www.mongodb.com/) - NoSQL database.
+  
+- **Other:**
+  - [Axios](https://axios-http.com/) - For making HTTP requests.
+  - [JWT](https://jwt.io/) - For authentication and authorization.
+  - [Stripe](https://stripe.com/) - For payment processing.
 
 ## Installation
 
+Follow these steps to set up and run the project locally on your computer.
+
 ### Prerequisites
-- Node.js (v14.x or higher)
-- npm (v6.x or higher) or yarn
 
-### Steps
-1. Install dependencies:
-    ```sh
-    npm install
-    ```
-    or
-    ```sh
-    yarn install
-    ```
+- **Node.js and npm:** Ensure you have [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed. You can download them from the official website.
 
-2. Start the development server:
-    ```sh
-    npm start
-    ```
-    or
-    ```sh
-    yarn start
-    ```
+### Navigating And Installing Dependencies
+
+- git clone https://github.com/ant0nlo/E-commerce.git
+- cd E-commerce
+- cd frontend
+- npm install
+- cd ../backend
+- npm install
+
+### Setting Up Environment Variables
+**Create a .env file for both frontend and backend, and add the necessary variables.**
+- **Backend .env:** <br /> 
+PORT=5000 <br /> 
+MONGO_URI=your_mongodb_connection_string <br /> 
+JWT_SECRET=your_jwt_secret <br /> 
+STRIPE_SECRET_KEY=your_stripe_secret_key <br /> 
+- **Frontend .env:** <br /> 
+REACT_APP_API_URL=http://localhost:5000/api <br /> 
+REACT_APP_STRIPE_PUBLIC_KEY=your_stripe_public_key
+
+### Running the Application
+- cd backend
+- npm start
+- cd frontend
+- npm start
+
+### Running the Admin Panel
+**The Admin Panel provides a user-friendly interface for administrators to manage products in the database. It allows adding new products, editing existing ones, and deleting products seamlessly without direct database interaction.**
+- cd admin
+- npm start
+
+**Admin Features**
+- Add New Products
+- Edit Existing Products:
+- Delete Products
+- Manage Categories
 
 ## Usage
-- The development server will start at `http://localhost:3000` by default.
 - Open your web browser and navigate to `http://localhost:3000` to view the application.
+- The Admin Panel will be accessible at `http://localhost:3001` (If port 3001 is in use, you might need to specify a different port.)
 
 ## Features
 - User Authentication
