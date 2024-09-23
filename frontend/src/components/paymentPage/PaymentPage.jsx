@@ -17,7 +17,7 @@ const PaymentPage = () => {
         }
 
         const script = document.createElement('script');
-        script.src = "https://www.paypal.com/sdk/js?client-id=AW_5OvedqUq6Y5o3uzg4TlIYi_UalDmwVebxbkLULYjlA_LyUlOz1l7wQPALxxHHKbIjsAutmMsMatzq"; // Replace with your PayPal client ID
+        script.src = "https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID"; // Replace with your PayPal client ID
         script.async = true;
         script.onload = () => {
             window.paypal.Buttons({
