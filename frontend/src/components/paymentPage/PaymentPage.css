@@ -1,0 +1,64 @@
+.payment-page {
+    max-width: 500px; /* Максимална ширина на страницата */
+    margin: 50px auto; /* Центрирайте страницата */
+    padding: 20px;
+    border: 1px solid #ddd; /* Лек бордър около формата */
+    border-radius: 8px; /* Закръглени ъгли */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Лек сянка */
+    background-color: #fff; /* Бял фон */
+}
+
+.payment-page h1 {
+    font-size: 24px; /* Размер на заглавието */
+    margin-bottom: 20px; /* Разстояние под заглавието */
+    text-align: center; /* Центрирано заглавие */
+}
+
+.payment-page h2 {
+    font-size: 20px; /* Размер на второто заглавие */
+    margin-bottom: 10px; /* Разстояние под второто заглавие */
+    text-align: center; /* Центрирано второ заглавие */
+    color: #333; /* Тъмен текст */
+}
+
+.payment-page h3 {
+    font-size: 18px; /* Размер на заглавието за методи на плащане */
+    margin: 20px 0; /* Разстояние отгоре и отдолу */
+    text-align: center; /* Центрирано заглавие */
+}
+
+.paypal-button {
+    padding: 10px; /* Вътрешно разстояние */
+    background-color: #007bff; /* Син фон */
+    color: white; /* Бял текст */
+    border: none; /* Без бордър */
+    border-radius: 4px; /* Закръглени ъгли на бутона */
+    font-size: 16px; /* Размер на шрифта на бутона */
+    cursor: pointer; /* Курсор при задържане */
+    width: 100%; /* Ширина на бутона 100% от родителския контейнер */
+    margin-top: 15px; /* Разстояние отгоре */
+}
+
+.paypal-button:hover {
+    background-color: #0056b3; /* По-тъмен фон при задържане */
+}
+
+/* Стилове за формата (ако решите да ги добавите) */
+.payment-page form {
+    display: flex;
+    flex-direction: column; /* Разположете полетата едно под друго */
+    margin-top: 20px; /* Разстояние отгоре */
+}
+
+.payment-page input {
+    margin-bottom: 15px; /* Разстояние между полетата */
+    padding: 10px; /* Вътрешно разстояние */
+    border: 1px solid #ccc; /* Бордър на полето */
+    border-radius: 4px; /* Закръглени ъгли на полето */
+    font-size: 16px; /* Размер на шрифта */
+}
+
+.payment-page input:focus {
+    border-color: #007bff; /* Бордър при фокус */
+    outline: none; /* Премахнете стандартния контур */
+}

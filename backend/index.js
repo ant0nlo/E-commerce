@@ -417,6 +417,53 @@ app.post('/getcart', fetchUser, async (req, res) => {
   }
 });
 
+// В index.js на Order Processing Service
+app.post('/order', async (req, res) => {
+  const { items, total, userEmail } = req.body;
+
+  // Валидация на данни (по избор)
+  if (!items || !userEmail) {
+      return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const order = {
+      id: uuidv4(),
+      items,
+      total,
+      userEmail,
+      status: 'PENDING'
+  };
+
+  try {
+      // Запис на поръчката в MongoDB
+      await db.collection('orders').insertOne(order);
+      console.log('Order saved:', order.id);
+
+      // Изпращане на съобщение до Payment Processing Service
+      const orderBuffer = Buffer.from(JSON.stringify(order));
+      channel.sendToQueue('payment_queue', orderBuffer, { persistent: true });
+      console.log('Order sent to payment queue');
+
+      res.status(201).json({ message: 'Order placed successfully', orderId: order.id });
+     // clearCart();
+      window.location.href = '/order-confirmation';
+  } catch (err) {
+      console.error('Error placing order:', err);
+      res.status(500).json({ error: 'Failed to place order' });
+  }
+});
+
+app.get('/getUserEmail', fetchUser, async (req, res) => {
+  try {
+      const user = await Users.findById(req.user.id); // Или каквото е необходимо за вашата логика
+      res.status(200).json({ email: user.email });
+  } catch (err) {
+      console.error('Error fetching user email:', err);
+      res.status(500).json({ error: 'Failed to fetch user email' });
+  }
+});
+
+
 // Стартиране на сървъра
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

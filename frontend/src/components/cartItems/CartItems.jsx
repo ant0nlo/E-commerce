@@ -1,10 +1,66 @@
 import React, { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'; // Вместо useHistory
 import { ShopContext } from '../../context/ShopContext'
 import './CartItems.css'
 import remove_icon from '../Assets/cart_cross_icon.png'
 
 const CartItems = () => {
+    const navigate = useNavigate(); // Инициализирайте useNavigate
     const {getTotalCartAmount, all_product, cartItems, removeFromCart} = useContext(ShopContext)
+
+    const handleCheckout = async () => {
+        const orderItems = Object.keys(cartItems).map(key => {
+            const [itemId, size] = key.split('-');
+            return {
+                productId: Number(itemId),
+                size,
+                quantity: cartItems[key]
+            };
+        });
+    
+        try {
+            // Извличане на имейла от базата данни, ако е необходимо
+            const userEmailResponse = await fetch(`http://localhost:4000/getUserEmail`, {
+                method: 'GET',
+                headers: {
+                    'auth-token': localStorage.getItem('auth-token'),
+                },
+            });
+            
+            const userEmailData = await userEmailResponse.json();
+    
+            if (!userEmailResponse.ok) {
+                alert('Failed to retrieve user email');
+                return;
+            }
+    
+            const orderData = {
+                items: orderItems,
+                total: getTotalCartAmount(),
+                userEmail: userEmailData.email, // Използвайте имейла от базата данни
+            };
+
+             const response = await fetch('http://localhost:3001/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData),
+            });
+    
+            const data = await response.json();
+            if (response.ok) {
+                navigate('/payment', { state: { orderData } }); // Използвайте navigate
+            } else {
+                alert(`Failed to place order: ${data.error}`);
+            }
+        } catch (error) {
+            console.error('Error during checkout:', error);
+            alert('There was an error processing your order. Please try again.');
+        } 
+    };
+    
+
   return (
     <div className='cartitems'>
         <div className="cartitems-format-main">
@@ -77,7 +133,7 @@ const CartItems = () => {
                         <h3>${getTotalCartAmount()}</h3>
                     </div>
                 </div>
-                <button>PROCEED TO CHECKOUT</button>
+                <button onClick={handleCheckout}>PROCEED TO CHECKOUT</button>
             </div>
             <div className="cartitems-promocode">
                 <p>Enter a promoocode</p>

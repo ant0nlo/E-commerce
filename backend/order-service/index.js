@@ -1,11 +1,14 @@
 // index.js
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors'); 
 const { MongoClient } = require('mongodb');
 const amqp = require('amqplib');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
+app.use(express.json());
+app.use(cors());
 app.use(express.json());
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
@@ -15,7 +18,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 let db;
 MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
   .then((client) => {
-    db = client.db('orderdb');
+    db = client.db('e-comm-api-db');
     console.log('Connected to MongoDB');
   })
   .catch((err) => console.error('Failed to connect to MongoDB', err));
@@ -33,6 +36,17 @@ async function connectRabbitMQ() {
   }
 }
 connectRabbitMQ();
+
+// Ендпойнт за извличане на всички поръчки
+app.get('/orders', async (req, res) => {
+  try {
+      const orders = await db.collection('orders').find({}).toArray();
+      res.status(200).json(orders);
+  } catch (err) {
+      console.error('Error fetching orders:', err);
+      res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
 
 // Place Order Endpoint
 app.post('/order', async (req, res) => {
