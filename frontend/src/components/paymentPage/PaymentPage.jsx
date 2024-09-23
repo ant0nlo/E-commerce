@@ -10,7 +10,7 @@ const PaymentPage = () => {
     useEffect(() => {
         // Зареждане на PayPal SDK
         const script = document.createElement('script');
-        script.src = "https://www.paypal.com/sdk/js?client-id=AW_5OvedqUq6Y5o3uzg4TlIYi_UalDmwVebxbkLULYjlA_LyUlOz1l7wQPALxxHHKbIjsAutmMsMatzq"; // Заменете с вашия клиентски идентификатор
+        script.src = "https://www.paypal.com/sdk/js?client-id=CLIENT_ID"; // Заменете с вашия клиентски идентификатор
         script.async = true;
         script.onload = () => {
             // Когато скриптът се зареди, можете да инициирате бутона
