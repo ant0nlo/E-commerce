@@ -49,7 +49,7 @@ Follow these steps to set up and run the project locally on your computer.
 - npm install
 
 ### Setting Up Environment Variables
-**Create a .env file for the backend, and add the necessary variables.**
+**Create a .env file for the backend and the services, and add the necessary variables.**
 
 ### Running the Application
 - cd backend
