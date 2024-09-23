@@ -5,16 +5,26 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');  
-const bcrypt = require('bcrypt'); // Добавен bcrypt
+const bcrypt = require('bcrypt'); // Password hashing
+const amqp = require('amqplib'); // RabbitMQ
+const { v4: uuidv4 } = require('uuid'); // UUID for unique IDs
 const app = express();
 require('dotenv').config(); 
 const PORT = process.env.PORT || 4000;
 
+// CORS Configuration
+const corsOptions = {
+  origin: 'http://localhost:3000', // Frontend origin
+  credentials: true, // Allow credentials (cookies, authorization headers)
+};
+
+
+app.use(cors(corsOptions));
+
 // Middleware
 app.use(express.json());
-app.use(cors());
 
-// MongoDB връзка с обновени опции
+// MongoDB Connection with Updated Options
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -22,7 +32,7 @@ mongoose.connect(process.env.MONGO_URI, {
  .then(() => console.log('MongoDB connected'))
  .catch(err => console.log(err));
 
-// Root endpoint
+// Root Endpoint
 app.get('/', (req, res) => {
   res.send('Successfully connected...')
 });
@@ -37,9 +47,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage: storage});
 
-// Създаване на endpoint за качване на изображения
+// Serve Static Images
 app.use('/images', express.static('upload/images'));
 
+// Image Upload Endpoint
 app.post('/upload', upload.single('product'), (req, res) => {
   res.json({
     success: 1,
@@ -47,12 +58,12 @@ app.post('/upload', upload.single('product'), (req, res) => {
   });
 });
 
-// Схема за създаване на продукти
+// Product Schema
 const Item = mongoose.model('Item', {
   id: {
     type: Number,
     required: true,
-    unique: true, // Добавен уникален индекс
+    unique: true, // Unique index
   },
   name: {
     type: String,
@@ -84,6 +95,7 @@ const Item = mongoose.model('Item', {
   },
 });
 
+// Add Product Endpoint
 app.post('/addproduct', async (req, res) => {
   try {
     let items = await Item.find({});
@@ -122,7 +134,7 @@ app.post('/addproduct', async (req, res) => {
   }
 });
 
-// Премахване на продукт от базата данни
+// Remove Product Endpoint
 app.post('/removeproduct', async (req, res) => {
   try {
     const result = await Item.findOneAndDelete({id: req.body.id});
@@ -147,7 +159,7 @@ app.post('/removeproduct', async (req, res) => {
   }
 });
 
-// Създаване на API за получаване на всички продукти
+// Get All Products Endpoint
 app.get('/allproducts', async (req, res) => {
   try {
     let items = await Item.find({});
@@ -162,7 +174,7 @@ app.get('/allproducts', async (req, res) => {
   }
 });
 
-// Схема за потребителски модел
+// User Schema
 const Users = mongoose.model('Users', {
   name:{
     type: String,
@@ -190,11 +202,11 @@ const Users = mongoose.model('Users', {
   },
 });
 
-// Създаване на endpoint за регистрация на потребителя
+// User Signup Endpoint
 app.post('/signup', async (req, res) => {
   try {
-    const { username, email, password } = req.body; // Променено от req.body.formData
-    // Валидация на входните данни
+    const { username, email, password } = req.body; // Changed from req.body.formData
+    // Validate input data
     if (!username || !email || !password) {
       return res.status(400).json({success:false, errors:"Please provide username, email and password"});
     }
@@ -204,15 +216,12 @@ app.post('/signup', async (req, res) => {
       return res.status(400).json({success:false, errors:"This email is already used!"});
     }
 
-    // Хеширане на паролата
+    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Инициализиране на cartData с 100 артикула, всички зададени на 0
+    // Initialize cartData with empty object
     let cart = {};
-   /*  for (let i = 0; i < 100; i++) {
-      cart[i.toString()] = 0; // Ключовете са низове
-    } */
 
     const user = new Users({
       name: username,
@@ -236,12 +245,12 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// Endpoint за логин на потребителя
+// User Login Endpoint
 app.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body; // Променено от req.body.formData
+    const { email, password } = req.body; // Changed from req.body.formData
 
-    // Валидация на входните данни
+    // Validate input data
     if (!email || !password) {
       return res.status(400).json({ success: false, error: "Please provide email and password" });
     }
@@ -251,10 +260,10 @@ app.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, error: "User not found" });
     }
 
-    // Сравняване на паролата
+    // Compare passwords
     const passCompare = await bcrypt.compare(password, user.password);
     if (passCompare){
-      // Генериране на токен
+      // Generate token
       const data = {
         user: {
           id: user._id
@@ -271,11 +280,11 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Създаване на endpoint за нови колекции
+// Get New Collections Endpoint
 app.get('/newcollections', async (req, res) => {
   try {
     let products = await Item.find({});
-    let newcollection = products.slice(-8); // Поправено slice за получаване на последните 8 артикула
+    let newcollection = products.slice(-8); // Fixed slice to get last 8 items
     console.log("New Collection Fetched");
     res.send(newcollection);
   } catch (error) {
@@ -284,7 +293,7 @@ app.get('/newcollections', async (req, res) => {
   }
 });
 
-// Създаване на endpoint за популярни продукти за жени
+// Get Popular Products for Women Endpoint
 app.get('/popularinwomen', async (req, res) => {
   try {
     let products = await Item.find({category:"women"});
@@ -297,7 +306,7 @@ app.get('/popularinwomen', async (req, res) => {
   }
 });
 
-// Създаване на middleware за извличане на потребителя
+// Middleware to Fetch User from Token
 const fetchUser = async (req, res, next) => {
   const token = req.header('auth-token');
   if (!token) {
@@ -312,7 +321,7 @@ const fetchUser = async (req, res, next) => {
   }
 };
 
-// Endpoint за добавяне на продукти в cartData
+// Add to Cart Endpoint
 app.post('/addtocart', fetchUser, async (req, res) => {
   try {
       const { itemId, size } = req.body;
@@ -323,7 +332,7 @@ app.post('/addtocart', fetchUser, async (req, res) => {
       const itemIdStr = itemId.toString();
       const sizeStr = size.toString().toUpperCase();
 
-      // Проверка дали itemId и size са валидни
+      // Check if itemId and size are valid
       const itemExists = await Item.findOne({ id: Number(itemIdStr) });
       if (!itemExists) {
           return res.status(400).json({ errors: "Invalid item ID" });
@@ -334,7 +343,7 @@ app.post('/addtocart', fetchUser, async (req, res) => {
           return res.status(400).json({ errors: "Invalid size selected" });
       }
 
-      // Актуализиране на cartData чрез $inc
+      // Update cartData using $inc
       const cartKey = `${itemIdStr}-${sizeStr}`;
       const updatedUser = await Users.findByIdAndUpdate(
           req.user.id,
@@ -353,7 +362,7 @@ app.post('/addtocart', fetchUser, async (req, res) => {
   }
 });
 
-// Endpoint за премахване на продукт от cartData
+// Remove from Cart Endpoint
 app.post('/removefromcart', fetchUser, async (req, res) => {
   try {
       const { itemId, size } = req.body;
@@ -364,7 +373,7 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
       const itemIdStr = itemId.toString();
       const sizeStr = size.toString().toUpperCase();
 
-      // Проверка дали itemId и size са валидни
+      // Check if itemId and size are valid
       const itemExists = await Item.findOne({ id: Number(itemIdStr) });
       if (!itemExists) {
           return res.status(400).json({ errors: "Invalid item ID" });
@@ -375,7 +384,7 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
           return res.status(400).json({ errors: "Invalid size selected" });
       }
 
-      // Намаляване на количеството само ако е > 0
+      // Decrease quantity only if > 0
       const user = await Users.findById(req.user.id);
       if (!user) {
           return res.status(404).json({ errors: "User not found" });
@@ -399,8 +408,7 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
   }
 });
 
-
-// Създаване на endpoint за получаване на cartData
+// Get Cart Data Endpoint
 app.post('/getcart', fetchUser, async (req, res) => {
   try {
     console.log("Get Cart");
@@ -408,8 +416,7 @@ app.post('/getcart', fetchUser, async (req, res) => {
     if (!userData) {
       res.status(404).send({ errors: "User not found" });
     } else {
-      res.json(Object.fromEntries(userData.cartData)); // Конвертиране от Map към Object
-      
+      res.json(Object.fromEntries(userData.cartData)); // Convert Map to Object
     }
   } catch (error) {
     console.error("Error getting cart:", error);
@@ -417,11 +424,12 @@ app.post('/getcart', fetchUser, async (req, res) => {
   }
 });
 
-// В index.js на Order Processing Service
+// *** IMPORTANT: Remove the following /order endpoint if using a separate Order Service ***
+/*
 app.post('/order', async (req, res) => {
   const { items, total, userEmail } = req.body;
 
-  // Валидация на данни (по избор)
+  // Validate input data
   if (!items || !userEmail) {
       return res.status(400).json({ error: 'Missing required fields' });
   }
@@ -435,27 +443,72 @@ app.post('/order', async (req, res) => {
   };
 
   try {
-      // Запис на поръчката в MongoDB
+      // Save order to MongoDB
       await db.collection('orders').insertOne(order);
       console.log('Order saved:', order.id);
 
-      // Изпращане на съобщение до Payment Processing Service
-      const orderBuffer = Buffer.from(JSON.stringify(order));
-      channel.sendToQueue('payment_queue', orderBuffer, { persistent: true });
-      console.log('Order sent to payment queue');
+      // Send message to Payment Processing Service via RabbitMQ
+      if (channel) {
+          const orderBuffer = Buffer.from(JSON.stringify(order));
+          channel.sendToQueue('payment_queue', orderBuffer, { persistent: true });
+          console.log('Order sent to payment queue');
+      } else {
+          console.error('RabbitMQ channel not available');
+          // Optionally handle this case (e.g., retry logic)
+      }
 
       res.status(201).json({ message: 'Order placed successfully', orderId: order.id });
-     // clearCart();
-      window.location.href = '/order-confirmation';
+      // Remove frontend redirection from backend
+      // window.location.href = '/order-confirmation'; // ❌ Remove this line
+  } catch (err) {
+      console.error('Error placing order:', err);
+      res.status(500).json({ error: 'Failed to place order' });
+  }
+});*/
+
+app.post('/order', async (req, res) => {
+  const { items, total, userEmail } = req.body;
+
+  // Validate input data
+  if (!items || !userEmail) {
+      return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const order = {
+      id: uuidv4(),
+      items,
+      total,
+      userEmail,
+      status: 'PENDING'
+  };
+
+  try {
+      // Save order to MongoDB
+      await db.collection('orders').insertOne(order);
+      console.log('Order saved:', order.id);
+
+      // Send message to Payment Processing Service via RabbitMQ
+      if (channel) {
+          const orderBuffer = Buffer.from(JSON.stringify(order));
+          channel.sendToQueue('payment_queue', orderBuffer, { persistent: true });
+          console.log('Order sent to payment queue');
+      } else {
+          console.error('RabbitMQ channel not available');
+          // Optionally handle this case (e.g., retry logic)
+      }
+
+      res.status(201).json({ message: 'Order placed successfully', orderId: order.id });
+      // Remove frontend redirection from backend
+      // window.location.href = '/order-confirmation'; // ❌ Remove this line
   } catch (err) {
       console.error('Error placing order:', err);
       res.status(500).json({ error: 'Failed to place order' });
   }
 });
-
+// Get User Email Endpoint
 app.get('/getUserEmail', fetchUser, async (req, res) => {
   try {
-      const user = await Users.findById(req.user.id); // Или каквото е необходимо за вашата логика
+      const user = await Users.findById(req.user.id); // Adjust as per your logic
       res.status(200).json({ email: user.email });
   } catch (err) {
       console.error('Error fetching user email:', err);
@@ -463,8 +516,7 @@ app.get('/getUserEmail', fetchUser, async (req, res) => {
   }
 });
 
-
-// Стартиране на сървъра
+// Start the Server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

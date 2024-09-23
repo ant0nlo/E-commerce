@@ -1,10 +1,14 @@
-// index.js
 require('dotenv').config();
+const express = require('express');
 const amqp = require('amqplib');
 const nodemailer = require('nodemailer');
-const { getEmailTemplate } = require('./emailTemplates');
+const { getEmailTemplate } = require('./emailTemplates'); // Ensure this module is properly implemented
+
+const app = express();
+app.use(express.json());
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
+const PORT = process.env.NOTIFICATION_SERVICE_PORT || 5003;
 
 // Email setup
 const transporter = nodemailer.createTransport({
@@ -18,43 +22,59 @@ const transporter = nodemailer.createTransport({
 });
 
 // RabbitMQ Connection and Consumer Setup
-async function consumeMessages() {
+let channel;
+async function connectRabbitMQ() {
   try {
     const connection = await amqp.connect(RABBITMQ_URL);
-    const channel = await connection.createChannel();
+    channel = await connection.createChannel();
     await channel.assertQueue('notification_queue', { durable: true });
+    await channel.assertQueue('dead_letter_queue', { durable: true });
+    console.log('Connected to RabbitMQ');
 
-    console.log('Notification Service waiting for messages');
-
-    channel.consume('notification_queue', async (msg) => {
-      if (msg !== null) {
-        const order = JSON.parse(msg.content.toString());
-        console.log('Sending notification for order:', order.id);
-
-        // Prepare email
-        const emailTemplate = getEmailTemplate(order);
-
-        const mailOptions = {
-          from: '"E-commerce Team" <no-reply@example.com>',
-          to: order.userEmail,
-          subject: emailTemplate.subject,
-          text: emailTemplate.text
-        };
-
-        // Send email
-        transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-            return console.error('Error sending email:', error);
-          }
-          console.log('Email sent:', info.response);
-        });
-
-        channel.ack(msg);
-      }
-    });
+    // Start consuming messages
+    channel.consume('notification_queue', processNotification, { noAck: false });
   } catch (err) {
     console.error('Error in Notification Service:', err);
   }
 }
+connectRabbitMQ();
 
-consumeMessages();
+// Function to process notification
+async function processNotification(msg) {
+  if (msg !== null) {
+    const order = JSON.parse(msg.content.toString());
+    console.log('Processing notification for order:', order.id);
+
+    try {
+      // Prepare email
+      const emailTemplate = getEmailTemplate(order);
+
+      const mailOptions = {
+        from: '"E-commerce Team" <no-reply@example.com>',
+        to: order.userEmail,
+        subject: emailTemplate.subject,
+        text: emailTemplate.text
+      };
+
+      // Send email
+      await transporter.sendMail(mailOptions);
+      console.log('Email sent for order:', order.id);
+
+      // Acknowledge the message
+      channel.ack(msg);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      // Optionally, implement retry logic or move message to a dead-letter queue
+      channel.nack(msg, false, false); // Discard the message
+    }
+  }
+}
+
+// Health Check Endpoint
+app.get('/health', (req, res) => {
+  res.status(200).send('Notification Service is healthy');
+});
+
+app.listen(PORT, () => {
+  console.log(`Notification Service running on port ${PORT}`);
+});

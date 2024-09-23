@@ -1,4 +1,3 @@
-// index.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors'); 
@@ -9,17 +8,22 @@ const { v4: uuidv4 } = require('uuid');
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use(express.json());
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
 const MONGODB_URI = process.env.MONGODB_URI;
+const PORT = process.env.ORDER_SERVICE_PORT || 3001;
 
 // MongoDB Connection
 let db;
 MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
   .then((client) => {
-    db = client.db('e-comm-api-db');
+    db = client.db('orderdb');
     console.log('Connected to MongoDB');
+
+    // Start the server after successful DB connection
+    app.listen(PORT, () => {
+      console.log(`Order Service running on port ${PORT}`);
+    });
   })
   .catch((err) => console.error('Failed to connect to MongoDB', err));
 
@@ -31,30 +35,35 @@ async function connectRabbitMQ() {
     channel = await connection.createChannel();
     await channel.assertQueue('payment_queue', { durable: true });
     console.log('Connected to RabbitMQ');
+
+    // Start consuming messages
+    channel.consume('payment_queue', processPayment, { noAck: false });
   } catch (err) {
     console.error('Failed to connect to RabbitMQ', err);
   }
 }
 connectRabbitMQ();
 
-// Ендпойнт за извличане на всички поръчки
-app.get('/orders', async (req, res) => {
-  try {
-      const orders = await db.collection('orders').find({}).toArray();
-      res.status(200).json(orders);
-  } catch (err) {
-      console.error('Error fetching orders:', err);
-      res.status(500).json({ error: 'Failed to fetch orders' });
-  }
-});
+// Function to process payment (if any logic needed here)
+async function processPayment(msg) {
+  // Placeholder if needed
+  channel.ack(msg);
+}
 
 // Place Order Endpoint
 app.post('/order', async (req, res) => {
+  const { items, total, userEmail } = req.body;
+
+  // Validate input data
+  if (!items || !userEmail) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
   const order = {
     id: uuidv4(),
-    items: req.body.items,
-    total: req.body.total,
-    userEmail: req.body.userEmail,
+    items,
+    total,
+    userEmail,
     status: 'PENDING'
   };
 
@@ -63,7 +72,7 @@ app.post('/order', async (req, res) => {
     await db.collection('orders').insertOne(order);
     console.log('Order saved:', order.id);
 
-    // Send message to Payment Processing Service
+    // Send message to Payment Service via RabbitMQ
     const orderBuffer = Buffer.from(JSON.stringify(order));
     channel.sendToQueue('payment_queue', orderBuffer, { persistent: true });
     console.log('Order sent to payment queue');
@@ -75,6 +84,19 @@ app.post('/order', async (req, res) => {
   }
 });
 
-app.listen(3001, () => {
-  console.log('Order Service running on port 3001');
+// Get Order Status Endpoint
+app.get('/order/:id', async (req, res) => {
+  const orderId = req.params.id;
+
+  try {
+    const order = await db.collection('orders').findOne({ id: orderId });
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    res.json(order);
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    res.status(500).json({ error: 'Failed to fetch order' });
+  }
 });

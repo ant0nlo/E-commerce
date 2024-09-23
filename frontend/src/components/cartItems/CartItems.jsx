@@ -50,7 +50,7 @@ const CartItems = () => {
     
             const data = await response.json();
             if (response.ok) {
-                navigate('/payment', { state: { orderData } }); // Използвайте navigate
+                navigate('/payment', { state: { orderId: data.orderId, totalAmount: orderData.total } });
             } else {
                 alert(`Failed to place order: ${data.error}`);
             }
