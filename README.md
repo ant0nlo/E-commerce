@@ -49,15 +49,7 @@ Follow these steps to set up and run the project locally on your computer.
 - npm install
 
 ### Setting Up Environment Variables
-**Create a .env file for both frontend and backend, and add the necessary variables.**
-- **Backend .env:** <br /> 
-PORT=5000 <br /> 
-MONGO_URI=your_mongodb_connection_string <br /> 
-JWT_SECRET=your_jwt_secret <br /> 
-STRIPE_SECRET_KEY=your_stripe_secret_key <br /> 
-- **Frontend .env:** <br /> 
-REACT_APP_API_URL=http://localhost:5000/api <br /> 
-REACT_APP_STRIPE_PUBLIC_KEY=your_stripe_public_key
+**Create a .env file for the backend and the services, and add the necessary variables.**
 
 ### Running the Application
 - cd backend

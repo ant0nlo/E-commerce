@@ -18,7 +18,7 @@ const PaymentPage = () => {
         }
 
         const script = document.createElement('script');
-        script.src = "https://www.paypal.com/sdk/js?client-id=ARedx8TG1GlS7JYSZl_z3pgtztA32y0UB4pEDSLKUQCdUHk5dIOx9gxO_JoPXDv-7mYk075av5vXkYSj"; // Use the PayPal client ID from .env
+        script.src = "https://www.paypal.com/sdk/js?client-id=CLIENT_ID"; // Заменете с вашия клиентски идентификатор
         script.async = true;
         script.onload = () => {
             window.paypal.Buttons({
