@@ -14,7 +14,7 @@ const ShopContextProvider = (props) => {
 
     useEffect(() => {
         // Вземане на всички продукти от backend
-        fetch('http://localhost:4000/allproducts')
+        fetch('http://18.206.137.223:4000/allproducts')
             .then((res) => res.json())
             .then((data) => set_all_product(data))
             .catch((error) => console.error("Error fetching products:", error));
@@ -22,7 +22,7 @@ const ShopContextProvider = (props) => {
         // Вземане на количката, ако потребителят е логнат
         const token = localStorage.getItem('auth-token');
         if (token) {
-            fetch('http://localhost:4000/getcart', {
+            fetch('http://18.206.137.223:4000/getcart', {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json', // Поправен хедър
@@ -45,7 +45,7 @@ const ShopContextProvider = (props) => {
             [cartKey]: (prev[cartKey] || 0) + 1
         }));
         if (localStorage.getItem('auth-token')) {
-            fetch('http://localhost:4000/addtocart', {
+            fetch('http://18.206.137.223:4000/addtocart', {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json', // Поправен хедър
@@ -74,7 +74,7 @@ const ShopContextProvider = (props) => {
     });
     // След това, добави логиката за актуализиране на бекенда
     if (localStorage.getItem('auth-token')) {
-        fetch('http://localhost:4000/removefromcart', {
+        fetch('http://18.206.137.223:4000/removefromcart', {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
