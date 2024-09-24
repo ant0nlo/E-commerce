@@ -17,7 +17,7 @@ const PORT = process.env.ORDER_SERVICE_PORT || 3001;
 let db;
 MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
   .then((client) => {
-    db = client.db('orderdb');
+    db = client.db('e-comm-api-db');
     console.log('Connected to MongoDB');
 
     // Start the server after successful DB connection

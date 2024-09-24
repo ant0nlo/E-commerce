@@ -3,8 +3,11 @@ const express = require('express');
 const amqp = require('amqplib');
 const { MongoClient } = require('mongodb');
 const axios = require('axios');
+const cors = require('cors'); // Import CORS
+
 
 const app = express();
+app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
@@ -18,7 +21,7 @@ const PORT = process.env.PAYMENT_SERVICE_PORT || 5001;
 let db;
 MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
   .then((client) => {
-    db = client.db('orderdb');
+    db = client.db('e-comm-api-db');
     console.log('Connected to MongoDB');
   })
   .catch((err) => console.error('Failed to connect to MongoDB', err));
@@ -102,9 +105,9 @@ async function processPayment(msg) {
 }
 
 // Payment Confirmation Endpoint
-app.post('/api/payment/confirm', async (req, res) => {
+/* app.post('/api/payment/confirm', async (req, res) => {
   const { orderId, paymentResult } = req.body;
-
+  console.log('Received payment confirmation:', req.body);
   if (!orderId || !paymentResult) {
     return res.status(400).json({ success: false, error: 'Missing orderId or paymentResult' });
   }
@@ -122,6 +125,37 @@ app.post('/api/payment/confirm', async (req, res) => {
       throw new Error('Payment not completed');
     }
 
+    // Update order status to PAID
+    await db.collection('orders').updateOne(
+      { id: orderId },
+      { $set: { status: 'PAID', paymentResult: paymentResult } }
+    );
+
+    console.log(`Order ${orderId} marked as PAID`);
+
+    // Send message to Shipment Service
+    const order = await db.collection('orders').findOne({ id: orderId });
+    const shipmentOrder = { ...order, status: 'READY_FOR_SHIPMENT' };
+    channel.sendToQueue('shipment_queue', Buffer.from(JSON.stringify(shipmentOrder)), { persistent: true });
+    console.log(`Order ${orderId} sent to shipment queue`);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error confirming payment:', error);
+    res.status(500).json({ success: false, error: 'Failed to confirm payment' });
+  }
+}); */
+
+// Payment Confirmation Endpoint
+app.post('/api/payment/confirm', async (req, res) => {
+  const { orderId, paymentResult } = req.body;
+  console.log('Received payment confirmation:', req.body);
+  
+  if (!orderId || !paymentResult) {
+    return res.status(400).json({ success: false, error: 'Missing orderId or paymentResult' });
+  }
+
+  try {
     // Update order status to PAID
     await db.collection('orders').updateOne(
       { id: orderId },

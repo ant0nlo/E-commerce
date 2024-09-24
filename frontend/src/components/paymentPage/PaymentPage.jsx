@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './PaymentPage.css';
 import { toast } from 'react-toastify';
 
+//const PAYPAL_CLIENT_ID = process.env.CLIENT_ID;
 
 const PaymentPage = () => {
     const location = useLocation();
@@ -17,7 +18,7 @@ const PaymentPage = () => {
         }
 
         const script = document.createElement('script');
-        script.src = "https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID"; // Replace with your PayPal client ID
+        script.src = "https://www.paypal.com/sdk/js?client-id=ARedx8TG1GlS7JYSZl_z3pgtztA32y0UB4pEDSLKUQCdUHk5dIOx9gxO_JoPXDv-7mYk075av5vXkYSj"; // Use the PayPal client ID from .env
         script.async = true;
         script.onload = () => {
             window.paypal.Buttons({
@@ -51,9 +52,8 @@ const PaymentPage = () => {
                         const result = await response.json();
                         if (result.success) {
                             // Redirect to order confirmation page
-                            navigate.push('/order-confirmation', { orderId: orderId });
+                                navigate('/', { state: { orderId: orderId } });
                         } else {
-                            // Handle payment confirmation failure
                             alert('Payment confirmation failed. Please contact support.');
                         }
                     } catch (error) {

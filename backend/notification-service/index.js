@@ -14,7 +14,7 @@ const PORT = process.env.NOTIFICATION_SERVICE_PORT || 5003;
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: process.env.EMAIL_PORT,
-  secure: false, // true for 465, false for other ports
+  secure: true, // true for 465, false for other ports
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
@@ -50,11 +50,12 @@ async function processNotification(msg) {
       const emailTemplate = getEmailTemplate(order);
 
       const mailOptions = {
-        from: '"E-commerce Team" <no-reply@example.com>',
+        from: process.env.EMAIL_USER ,
         to: order.userEmail,
         subject: emailTemplate.subject,
         text: emailTemplate.text
       };
+      console.log(mailOptions)
 
       // Send email
       await transporter.sendMail(mailOptions);
