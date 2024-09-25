@@ -1,0 +1,51 @@
+ INFO  Accepting connections at http://localhost:3000
+ HTTP  9/24/2024 8:05:11 PM 85.11.133.141 GET /
+ HTTP  9/24/2024 8:05:11 PM 85.11.133.141 Returned 304 in 39 ms
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 GET /static/css/main.d55cec3f.css
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 Returned 304 in 4 ms
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 GET /static/js/main.e2039b80.js
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 Returned 304 in 4 ms
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 GET /favicon.ico
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 Returned 304 in 5 ms
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 GET /static/media/bag_logo2.e0da9ccafeb0ff76933c.png
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 Returned 304 in 4 ms
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 GET /static/media/banner4.457c3c2e2a343e14ffce.jpg
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 GET /static/media/exclusive_image.e8118f2149d9cb916980.png
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 Returned 304 in 16 ms
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 Returned 304 in 6 ms
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 GET /favicon.ico
+ HTTP  9/24/2024 8:05:12 PM 85.11.133.141 Returned 304 in 2 ms
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 GET /
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 Returned 304 in 1 ms
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 GET /static/js/main.e2039b80.js
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 Returned 304 in 1 ms
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 GET /static/css/main.d55cec3f.css
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 Returned 304 in 2 ms
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 GET /favicon.ico
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 Returned 304 in 1 ms
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 GET /static/media/bag_logo2.e0da9ccafeb0ff76933c.png
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 Returned 304 in 1 ms
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 GET /static/media/banner4.457c3c2e2a343e14ffce.jpg
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 Returned 304 in 2 ms
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 GET /static/media/exclusive_image.e8118f2149d9cb916980.png
+ HTTP  9/24/2024 8:05:17 PM 85.11.133.141 Returned 304 in 1 ms
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 GET /favicon.ico
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 Returned 304 in 2 ms
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 GET /
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 Returned 304 in 1 ms
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 GET /static/js/main.e2039b80.js
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 Returned 304 in 2 ms
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 GET /static/css/main.d55cec3f.css
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 Returned 304 in 0 ms
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 GET /favicon.ico
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 Returned 304 in 1 ms
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 GET /static/media/bag_logo2.e0da9ccafeb0ff76933c.png
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 GET /static/media/banner4.457c3c2e2a343e14ffce.jpg
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 Returned 304 in 2 ms
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 Returned 304 in 4 ms
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 GET /static/media/exclusive_image.e8118f2149d9cb916980.png
+ HTTP  9/24/2024 8:05:18 PM 85.11.133.141 Returned 304 in 1 ms
+ HTTP  9/24/2024 8:05:19 PM 85.11.133.141 GET /static/media/womens3.983481d56d119300b795.png
+ HTTP  9/24/2024 8:05:19 PM 85.11.133.141 Returned 200 in 10 ms
+
+ INFO  Gracefully shutting down. Please wait...

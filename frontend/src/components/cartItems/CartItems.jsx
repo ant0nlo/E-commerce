@@ -4,6 +4,8 @@ import { ShopContext } from '../../context/ShopContext'
 import './CartItems.css'
 import remove_icon from '../Assets/cart_cross_icon.png'
 
+const IP = process.env.REACT_APP_IP;
+
 const CartItems = () => {
     const navigate = useNavigate(); // Инициализирайте useNavigate
     const {getTotalCartAmount, all_product, cartItems, removeFromCart} = useContext(ShopContext)
@@ -20,7 +22,7 @@ const CartItems = () => {
     
         try {
             // Извличане на имейла от базата данни, ако е необходимо
-            const userEmailResponse = await fetch(`http://localhost:4000/getUserEmail`, {
+            const userEmailResponse = await fetch(`http://${IP}:4000/getUserEmail`, {
                 method: 'GET',
                 headers: {
                     'auth-token': localStorage.getItem('auth-token'),
@@ -40,7 +42,7 @@ const CartItems = () => {
                 userEmail: userEmailData.email, // Използвайте имейла от базата данни
             };
 
-             const response = await fetch('http://localhost:3001/order', {
+             const response = await fetch(`http://${IP}:3001/order`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

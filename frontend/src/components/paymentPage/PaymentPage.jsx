@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './PaymentPage.css';
 import { toast } from 'react-toastify';
 
-//const PAYPAL_CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+const IP = process.env.REACT_APP_IP;
 
 const PaymentPage = () => {
     const location = useLocation();
@@ -18,7 +19,7 @@ const PaymentPage = () => {
         }
 
         const script = document.createElement('script');
-        script.src = "https://www.paypal.com/sdk/js?client-id=CLIENT_ID"; // Заменете с вашия клиентски идентификатор
+        script.src = `https://www.paypal.com/sdk/js?client-id=${CLIENT_ID}`; // Заменете с вашия клиентски идентификатор
         script.async = true;
         script.onload = () => {
             window.paypal.Buttons({
@@ -37,7 +38,7 @@ const PaymentPage = () => {
 
                     // Notify backend about the payment success
                     try {
-                        const response = await fetch('http://localhost:5001/api/payment/confirm', {
+                        const response = await fetch(`http://${IP}:5001/api/payment/confirm`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

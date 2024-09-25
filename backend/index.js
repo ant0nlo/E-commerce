@@ -11,10 +11,11 @@ const { v4: uuidv4 } = require('uuid'); // UUID for unique IDs
 const app = express();
 require('dotenv').config(); 
 const PORT = process.env.PORT || 4000;
+const IP = process.env.IP;
 
 // CORS Configuration
 const corsOptions = {
-  origin: 'http://localhost:3000', // Frontend origin
+  origin: `http://${IP}:3000`, // Frontend origin
   credentials: true, // Allow credentials (cookies, authorization headers)
 };
 
@@ -54,7 +55,7 @@ app.use('/images', express.static('upload/images'));
 app.post('/upload', upload.single('product'), (req, res) => {
   res.json({
     success: 1,
-    image_url: `http://localhost:${PORT}/images/${req.file.filename}`
+    image_url: `http://${IP}:${PORT}/images/${req.file.filename}`
   });
 });
 
