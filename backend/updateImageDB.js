@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 require('dotenv').config(); 
 
-const IP = process.env.IP; // Уверете се, че IP е дефинирано правилно
-const OLD_IP = process.env.OLD_IP; // Уверете се, че IP е дефинирано правилно
+const IP = 'https://e-comm-3ab.pages.dev'; // Уверете се, че IP е дефинирано правилно
+const OLD_IP = 'https://e-comm-3ab.pages.dev/'; // Уверете се, че IP е дефинирано правилно
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -27,7 +27,7 @@ const Item = mongoose.model('Item', productSchema);
 
 const updateImageUrls = async () => {
   try {
-    const products = await Item.find({ image: { $regex: `http://${OLD_IP}:4000` } });
+    const products = await Item.find({ image: { $regex: `${OLD_IP}` } });
     for (const product of products) {
       product.image = product.image.replace(`${OLD_IP}`, `${IP}`);
       await product.save();
