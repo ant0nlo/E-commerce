@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 require('dotenv').config(); 
 
-const IP = 'https://e-comm-3ab.pages.dev'; // Уверете се, че IP е дефинирано правилно
-const OLD_IP = 'https://e-comm-3ab.pages.dev/'; // Уверете се, че IP е дефинирано правилно
+const IP = 'https://e-commerce-8wzd.onrender.com'; // Уверете се, че IP е дефинирано правилно
+const OLD_IP = 'e-commerce-8wzd.onrender.com'; // Уверете се, че IP е дефинирано правилно
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,

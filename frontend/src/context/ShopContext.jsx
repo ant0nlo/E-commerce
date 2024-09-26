@@ -1,9 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
 
 export const ShopContext = createContext(null);
-
-// Заменете с вашия публичен URL адрес на бекенда
-const BACKEND_URL = 'https://e-commerce-8wzd.onrender.com'; // Примерен URL адрес на бекенда
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;   
 
 // Инициализиране на количката като празен обект
 const getDefaultCart = () => {

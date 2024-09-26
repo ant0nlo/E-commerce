@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './CSS/LoginSignup.css';
-const IP = 'localhost'
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;   
 
 const LoginSignup = () => {
 
@@ -33,7 +33,7 @@ const LoginSignup = () => {
     console.log('Login Function Executed', formData);
     let responseData;
     try {
-      const response = await fetch(`http://${IP}:4000/login`, {
+      const response = await fetch(`${BACKEND_URL}/login`, {
           method:"POST",
           headers: {
             'Accept': 'application/json',
@@ -67,7 +67,7 @@ const LoginSignup = () => {
 
     let responseData;
     try {
-      const response = await fetch(`http://${IP}:4000/signup`, {
+      const response = await fetch(`${BACKEND_URL}/signup`, {
         method:"POST",
         headers: {
           'Accept': 'application/json',
