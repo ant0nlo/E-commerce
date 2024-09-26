@@ -19,15 +19,9 @@ const corsOptions = {
   credentials: true, // Allow credentials (cookies, authorization headers)
 }; */
 
-// Определете произхода на фронтенда
-const frontendOrigin = process.env.NODE_ENV === 'production' 
-    ? 'https://e-comm-3ab.pages.dev/' // Промяна на домейна в продукция
-    : `http://${IP}:3000`; // Локален домейн за разработка
-
-// CORS конфигурация
 const corsOptions = {
-  origin: frontendOrigin, // Произход на фронтенда
-  credentials: true, // Разрешете удостоверяване (бисквитки, заглавия на удостоверяване)
+  origin: 'https://e-comm-3ab.pages.dev', // Заменете с вашия фронтенд домейн
+  credentials: true, // Позволява удостоверяване (бисквитки, заглавия на удостоверяване)
 };
 
 app.use(cors(corsOptions));
@@ -65,7 +59,7 @@ app.use('/images', express.static('upload/images'));
 app.post('/upload', upload.single('product'), (req, res) => {
   res.json({
     success: 1,
-    image_url: `http://${IP}:${PORT}/images/${req.file.filename}`
+    image_url: `https://e-comm-3ab.pages.dev/images/${req.file.filename}`
   });
 });
 
