@@ -4,6 +4,8 @@ import { ShopContext } from '../../context/ShopContext';
 import './CartItems.css';
 import remove_icon from '../Assets/cart_cross_icon.png';
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;   
+
 const CartItems = () => {
     const navigate = useNavigate();
     const { getTotalCartAmount, all_product, cartItems, removeFromCart } = useContext(ShopContext);
@@ -20,7 +22,7 @@ const CartItems = () => {
 
         try {
             // Извличане на имейла на потребителя
-            const userEmailResponse = await fetch(`http://localhost:4000/getUserEmail`, {
+            const userEmailResponse = await fetch(`${BACKEND_URL}/getUserEmail`, {
                 method: 'GET',
                 headers: {
                     'auth-token': localStorage.getItem('auth-token'),

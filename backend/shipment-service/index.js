@@ -7,6 +7,7 @@ const RABBITMQ_URL = process.env.RABBITMQ_URL;
 const MONGODB_URI = process.env.MONGODB_URI;
 const PORT = process.env.SHIPMENT_SERVICE_PORT || 5002;
 
+const express = require('express');
 const app = express();
 
 // MongoDB Connection

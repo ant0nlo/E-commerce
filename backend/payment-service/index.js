@@ -5,7 +5,15 @@ const { MongoClient } = require('mongodb');
 const axios = require('axios');
 
 const app = express();
-app.use(cors());
+
+// CORS Configuration
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://e-comm-3ab.pages.dev/' // Заменете с реалния домейн на фронтенда
+    : `http://localhost:3000`, // За разработка
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const MONGODB_URI = process.env.MONGODB_URI;

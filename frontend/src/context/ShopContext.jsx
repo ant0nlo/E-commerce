@@ -1,8 +1,9 @@
-// ShopContext.js
 import React, { createContext, useEffect, useState } from "react";
 
 export const ShopContext = createContext(null);
-const IP = 'localhost'
+
+// Заменете с вашия публичен URL адрес на бекенда
+const BACKEND_URL = 'https://e-commerce-8wzd.onrender.com'; // Примерен URL адрес на бекенда
 
 // Инициализиране на количката като празен обект
 const getDefaultCart = () => {
@@ -15,13 +16,11 @@ const ShopContextProvider = (props) => {
 
     const clearCart = () => {
         setCartItems({}); // Set cart items to an empty object
-        // You can also add additional logic here, like clearing from localStorage
-        // localStorage.removeItem('cart'); // If you are using localStorage
     };
 
     useEffect(() => {
         // Вземане на всички продукти от backend
-        fetch(`http://${IP}:4000/allproducts`)
+        fetch(`${BACKEND_URL}/allproducts`)
             .then((res) => res.json())
             .then((data) => set_all_product(data))
             .catch((error) => console.error("Error fetching products:", error));
@@ -29,7 +28,7 @@ const ShopContextProvider = (props) => {
         // Вземане на количката, ако потребителят е логнат
         const token = localStorage.getItem('auth-token');
         if (token) {
-            fetch(`http://${IP}:4000/getcart`, {
+            fetch(`${BACKEND_URL}/getcart`, {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json', // Поправен хедър
@@ -52,7 +51,7 @@ const ShopContextProvider = (props) => {
             [cartKey]: (prev[cartKey] || 0) + 1
         }));
         if (localStorage.getItem('auth-token')) {
-            fetch(`http://${IP}:4000/addtocart`, {
+            fetch(`${BACKEND_URL}/addtocart`, {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json', // Поправен хедър
@@ -68,33 +67,33 @@ const ShopContextProvider = (props) => {
     }
 
     const removeFromCart = (itemId, size) => {
-    const cartKey = `${itemId}-${size}`; // Комбинация от itemId и size
-    setCartItems((prev) => {
-        const updatedCart = { ...prev };
-        if (updatedCart[cartKey] > 0) {
-            updatedCart[cartKey] -= 1;
+        const cartKey = `${itemId}-${size}`; // Комбинация от itemId и size
+        setCartItems((prev) => {
+            const updatedCart = { ...prev };
+            if (updatedCart[cartKey] > 0) {
+                updatedCart[cartKey] -= 1;
+            }
+            if (updatedCart[cartKey] === 0) {
+                delete updatedCart[cartKey]; // Изтриване на ключа, ако количеството е 0
+            }
+            return updatedCart;
+        });
+        // След това, добави логиката за актуализиране на бекенда
+        if (localStorage.getItem('auth-token')) {
+            fetch(`${BACKEND_URL}/removefromcart`, {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'auth-token': `${localStorage.getItem('auth-token')}`,
+                },
+                body: JSON.stringify({ "itemId": itemId, "size": size })
+            })
+            .then((res) => res.json())
+            .then((data) => console.log("Remove from cart response:", data))
+            .catch((error) => console.error("Error removing from cart:", error));
         }
-        if (updatedCart[cartKey] === 0) {
-            delete updatedCart[cartKey]; // Изтриване на ключа, ако количеството е 0
-        }
-        return updatedCart;
-    });
-    // След това, добави логиката за актуализиране на бекенда
-    if (localStorage.getItem('auth-token')) {
-        fetch(`http://${IP}:4000/removefromcart`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'auth-token': `${localStorage.getItem('auth-token')}`,
-            },
-            body: JSON.stringify({ "itemId": itemId, "size": size })
-        })
-        .then((res) => res.json())
-        .then((data) => console.log("Remove from cart response:", data))
-        .catch((error) => console.error("Error removing from cart:", error));
     }
-}
 
     // Функция за изчисляване на общата сума в количката
     const getTotalCartAmount = () => {

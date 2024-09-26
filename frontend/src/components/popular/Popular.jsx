@@ -2,15 +2,14 @@ import React, { useEffect, useState } from 'react'
 import './Popular.css'
 import Item from "../item/Item"
 
-const IP = process.env.REACT_APP_IP;   
-
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;   
 
 const Popular = () => {
 
   const [popular, setPopular] = useState([])
   
   useEffect(()=>{
-    fetch(`http://${IP}:4000/popularinwomen`)
+    fetch(`${BACKEND_URL}/popularinwomen`)
     .then((res)=>res.json())
     .then((data)=>setPopular(data))
   }, [])

@@ -11,14 +11,24 @@ const { v4: uuidv4 } = require('uuid'); // UUID for unique IDs
 const app = express();
 require('dotenv').config(); 
 const PORT = process.env.PORT || 4000;
-const IP = 'localhost'; // Уверете се, че IP е дефинирано правилно
-
+const IP = process.env.IP; // Уверете се, че IP е дефинирано правилно
+/* 
 // CORS Configuration
 const corsOptions = {
   origin: `http://${IP}:3000`, // Frontend origin
   credentials: true, // Allow credentials (cookies, authorization headers)
-};
+}; */
 
+// Определете произхода на фронтенда
+const frontendOrigin = process.env.NODE_ENV === 'production' 
+    ? 'https://e-comm-3ab.pages.dev/' // Промяна на домейна в продукция
+    : `http://${IP}:3000`; // Локален домейн за разработка
+
+// CORS конфигурация
+const corsOptions = {
+  origin: frontendOrigin, // Произход на фронтенда
+  credentials: true, // Разрешете удостоверяване (бисквитки, заглавия на удостоверяване)
+};
 
 app.use(cors(corsOptions));
 

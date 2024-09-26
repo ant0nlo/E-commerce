@@ -6,8 +6,16 @@ const amqp = require('amqplib');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
+
+// CORS Configuration
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://e-commerce-8wzd.onrender.com' // Заменете с реалния домейн на фронтенда
+    : 'http://localhost:3000', // За разработка
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cors());
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
 const MONGODB_URI = process.env.MONGODB_URI;
