@@ -1,24 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'; 
 import './PaymentPage.css';
-import { toast } from 'react-toastify';
+import { ShopContext } from '../../context/ShopContext';
+import axios from 'axios'; // Използвайте axios за по-лесно управление на HTTP заявките
 
-//const PAYPAL_CLIENT_ID = process.env.CLIENT_ID;
+const PAYPAL_CLIENT_ID = process.env.REACT_APP_CLIENT_ID;    
 
 const PaymentPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { orderId, totalAmount } = location.state || {}; // Ensure orderId and totalAmount are passed
+    const { orderData } = location.state || {}; // Получаване на orderData с shipmentInfo
+    const { clearCart } = useContext(ShopContext);
+
 
     useEffect(() => {
-        if (!orderId || !totalAmount) {
+        if (!orderData) {
             alert('Missing order details. Please try again.');
             navigate('/cart');
             return;
         }
 
         const script = document.createElement('script');
-        script.src = "https://www.paypal.com/sdk/js?client-id=CLIENT_ID"; // Заменете с вашия клиентски идентификатор
+        script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}`;
         script.async = true;
         script.onload = () => {
             window.paypal.Buttons({
@@ -26,7 +29,7 @@ const PaymentPage = () => {
                     return actions.order.create({
                         purchase_units: [{
                             amount: {
-                                value: totalAmount.toString()
+                                value: orderData.total.toString()
                             }
                         }]
                     });
@@ -35,24 +38,28 @@ const PaymentPage = () => {
                     const paymentResult = await actions.order.capture();
                     console.log('Payment successful!', paymentResult);
 
-                    // Notify backend about the payment success
                     try {
-                        const response = await fetch('http://localhost:5001/api/payment/confirm', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem('token')}` // Assuming JWT is stored in localStorage
+                        // Изпращане на потвърждение за плащане към Payment Service
+                        const response = await axios.post('http://localhost:5001/api/payment/confirm', {
+                            orderId: paymentResult.id, // Идентификаторът от PayPal
+                            paymentResult: {
+                                ...paymentResult,
+                                items: orderData.items,
+                                total: orderData.total,
+                                userEmail: orderData.userEmail
                             },
-                            body: JSON.stringify({
-                                orderId: orderId,
-                                paymentResult: paymentResult
-                            })
+                            shipmentInfo: orderData.shipmentInfo
+                        }, {
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('token')}` // Ако използвате JWT
+                            }
                         });
 
-                        const result = await response.json();
-                        if (result.success) {
-                            // Redirect to order confirmation page
-                                navigate('/', { state: { orderId: orderId } });
+                        if (response.data.success) {
+                            // Навигиране към страница за потвърждение на поръчката
+                            navigate('/order-confirmation', { state: { orderId: response.data.orderId } });
+                            // Опционално: Изчистване на кошницата
+                            clearCart();
                         } else {
                             alert('Payment confirmation failed. Please contact support.');
                         }
@@ -61,9 +68,14 @@ const PaymentPage = () => {
                         alert('An error occurred while confirming your payment.');
                     }
                 },
+                onCancel: () => {
+                    alert('Payment was cancelled.');
+                    navigate('/cart');
+                },
                 onError: (err) => {
                     console.error('Error with PayPal payment:', err);
                     alert('An error occurred during the payment process.');
+                    navigate('/cart');
                 }
             }).render('#paypal-button-container');
         };
@@ -72,12 +84,12 @@ const PaymentPage = () => {
         return () => {
             document.body.removeChild(script);
         };
-    }, [orderId, totalAmount, navigate]);
+    }, [orderData, navigate]);
 
     return (
         <div className="payment-page">
             <h1>Payment Page</h1>
-            <h2>Total Amount: ${totalAmount}</h2>
+            <h2>Total Amount: ${orderData.total}</h2>
             <div id="paypal-button-container"></div>
         </div>
     );

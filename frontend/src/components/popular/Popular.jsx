@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react'
 import './Popular.css'
 import Item from "../item/Item"
 
+const IP = process.env.REACT_APP_IP;   
+
+
 const Popular = () => {
 
   const [popular, setPopular] = useState([])
   
   useEffect(()=>{
-    fetch('http://localhost:4000/popularinwomen')
+    fetch(`http://${IP}:4000/popularinwomen`)
     .then((res)=>res.json())
     .then((data)=>setPopular(data))
   }, [])

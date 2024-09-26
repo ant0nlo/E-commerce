@@ -1,12 +1,12 @@
-import React, { useContext } from 'react'
-import { useNavigate } from 'react-router-dom'; // Вместо useHistory
-import { ShopContext } from '../../context/ShopContext'
-import './CartItems.css'
-import remove_icon from '../Assets/cart_cross_icon.png'
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ShopContext } from '../../context/ShopContext';
+import './CartItems.css';
+import remove_icon from '../Assets/cart_cross_icon.png';
 
 const CartItems = () => {
-    const navigate = useNavigate(); // Инициализирайте useNavigate
-    const {getTotalCartAmount, all_product, cartItems, removeFromCart} = useContext(ShopContext)
+    const navigate = useNavigate();
+    const { getTotalCartAmount, all_product, cartItems, removeFromCart } = useContext(ShopContext);
 
     const handleCheckout = async () => {
         const orderItems = Object.keys(cartItems).map(key => {
@@ -17,79 +17,50 @@ const CartItems = () => {
                 quantity: cartItems[key]
             };
         });
-    
+
         try {
-            // Извличане на имейла от базата данни, ако е необходимо
+            // Извличане на имейла на потребителя
             const userEmailResponse = await fetch(`http://localhost:4000/getUserEmail`, {
                 method: 'GET',
                 headers: {
                     'auth-token': localStorage.getItem('auth-token'),
                 },
             });
-            
+
             const userEmailData = await userEmailResponse.json();
-    
+
             if (!userEmailResponse.ok) {
-                alert('Failed to retrieve user email');
+                alert('Неуспешно извличане на имейла на потребителя');
                 return;
             }
-    
+
             const orderData = {
                 items: orderItems,
                 total: getTotalCartAmount(),
-                userEmail: userEmailData.email, // Използвайте имейла от базата данни
+                userEmail: userEmailData.email,
             };
 
-             const response = await fetch('http://localhost:3001/order', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(orderData),
-            });
-    
-            const data = await response.json();
-            if (response.ok) {
-                navigate('/payment', { state: { orderId: data.orderId, totalAmount: orderData.total } });
-            } else {
-                alert(`Failed to place order: ${data.error}`);
-            }
+            // Навигиране към Shipment Page с orderData
+            navigate('/shipment', { state: { orderData } });
         } catch (error) {
-            console.error('Error during checkout:', error);
-            alert('There was an error processing your order. Please try again.');
-        } 
+            console.error('Грешка по време на процеса на поръчка:', error);
+            alert('Възникна грешка при обработката на вашата поръчка. Моля, опитайте отново.');
+        }
     };
-    
 
-  return (
-    <div className='cartitems'>
-        <div className="cartitems-format-main">
-            <p>Products</p>
-            <p>Title</p>
-            <p>Price</p>
-            <p>Quantity</p>
-            <p>Total</p>
-            <p>Remove</p>
-        </div>
-        <hr />
-        {/* {all_product.map((e)=>{
-            if(cartItems[e.id]>0){
-                return <div>
-                    <div className="cartitems-format">
-                        <img src={e.image} className='carticon-product-icon' alt="" />
-                        <p>{e.name}</p>
-                        <p>${e.new_price}</p>
-                        <button className='cartitems-quantity'>{cartItems[e.id]}</button>
-                        <p>${e.new_price * cartItems[e.id]}</p>
-                        <img className='carticon-remove-icon' src={remove_icon} onClick={()=>{removeFromCart(e.id)}} alt="" />
-                    </div>
-                    <hr />
-            </div> 
-            }
-            return null;
-        })} */}
-        {Object.keys(cartItems).map((key) => {
-                const [itemId, size] = key.split('-'); // Разделяме ключа на itemId и size
+    return (
+        <div className='cartitems'>
+            <div className="cartitems-format-main">
+                <p>Products</p>
+                <p>Title</p>
+                <p>Price</p>
+                <p>Quantity</p>
+                <p>Total</p>
+                <p>Remove</p>
+            </div>
+            <hr />
+            {Object.keys(cartItems).map((key) => {
+                const [itemId, size] = key.split('-');
                 const product = all_product.find((p) => p.id === Number(itemId));
 
                 if (product && cartItems[key] > 0) {
@@ -114,37 +85,37 @@ const CartItems = () => {
                 }
                 return null;
             })}
-        <div className="cartitems-down">
-            <div className="cartitems-total">
-                <h1>cart Totals</h1>
-                <div>
-                    <div className='cartitems-total-item'>
-                        <p>Subtotal</p>
-                        <p>${getTotalCartAmount()}</p>
+            <div className="cartitems-down">
+                <div className="cartitems-total">
+                    <h1>Cart Totals</h1>
+                    <div>
+                        <div className='cartitems-total-item'>
+                            <p>Subtotal</p>
+                            <p>${getTotalCartAmount()}</p>
+                        </div>
+                        <hr />
+                        <div className="cartitems-total-item">
+                            <p>Shipping Fee</p>
+                            <p>Free</p>
+                        </div>
+                        <hr />
+                        <div className="cartitems-total-item">
+                            <h3>Total</h3>
+                            <h3>${getTotalCartAmount()}</h3>
+                        </div>
                     </div>
-                    <hr />
-                    <div className="cartitems-total-item">
-                        <p>Shipping Fee</p>
-                        <p>Free</p>
-                    </div>
-                    <hr />
-                    <div className="cartitems-total-item">
-                        <h3>Total</h3>
-                        <h3>${getTotalCartAmount()}</h3>
-                    </div>
+                    <button onClick={handleCheckout}>PROCEED TO CHECKOUT</button>
                 </div>
-                <button onClick={handleCheckout}>PROCEED TO CHECKOUT</button>
-            </div>
-            <div className="cartitems-promocode">
-                <p>Enter a promoocode</p>
-                <div className="cartitems-promobox">
-                    <input type="text" placeholder='promo code' />
-                    <button>Submit</button>
+                <div className="cartitems-promocode">
+                    <p>Enter a promo code</p>
+                    <div className="cartitems-promobox">
+                        <input type="text" placeholder='Promo code' />
+                        <button>Submit</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-  )
-}
+    );
+};
 
-export default CartItems
+export default CartItems;

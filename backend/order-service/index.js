@@ -16,7 +16,7 @@ const PORT = process.env.ORDER_SERVICE_PORT || 3001;
 // MongoDB Connection
 let db;
 MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
-  .then((client) => {
+  .then((client) => { 
     db = client.db('e-comm-api-db');
     console.log('Connected to MongoDB');
 
@@ -27,61 +27,56 @@ MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
   })
   .catch((err) => console.error('Failed to connect to MongoDB', err));
 
-// RabbitMQ Connection
+// RabbitMQ Connection за Shipment и Notification Services
 let channel;
 async function connectRabbitMQ() {
   try {
     const connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
-    await channel.assertQueue('payment_queue', { durable: true });
-    console.log('Connected to RabbitMQ');
-
-    // Start consuming messages
-    channel.consume('payment_queue', processPayment, { noAck: false });
+    await channel.assertQueue('shipment_queue', { durable: true });
+    await channel.assertQueue('notification_queue', { durable: true });
+    console.log('Connected to RabbitMQ for Shipment and Notification Services');
   } catch (err) {
     console.error('Failed to connect to RabbitMQ', err);
   }
 }
 connectRabbitMQ();
 
-// Function to process payment (if any logic needed here)
-async function processPayment(msg) {
-  // Placeholder if needed
-  channel.ack(msg);
-}
+// Създаване на поръчка след успешно плащане
+app.post('/create-order', async (req, res) => {
+    const { items, total, userEmail, shipmentInfo, paymentResult } = req.body;
 
-// Place Order Endpoint
-app.post('/order', async (req, res) => {
-  const { items, total, userEmail } = req.body;
+    // Валидация на входните данни
+    if (!items || !userEmail || !shipmentInfo || !paymentResult) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
 
-  // Validate input data
-  if (!items || !userEmail) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
+    const order = {
+        id: uuidv4(),
+        items,
+        total,
+        userEmail,
+        shipmentInfo,
+        paymentResult,
+        status: 'PAID',
+        createdAt: new Date()
+    };
 
-  const order = {
-    id: uuidv4(),
-    items,
-    total,
-    userEmail,
-    status: 'PENDING'
-  };
+    try {
+        // Запазване на поръчката в MongoDB
+        await db.collection('orders').insertOne(order);
+        console.log('Order saved:', order.id);
 
-  try {
-    // Save order to MongoDB
-    await db.collection('orders').insertOne(order);
-    console.log('Order saved:', order.id);
+        // Изпращане на съобщение към Shipment Service
+        const shipmentOrder = { ...order, status: 'READY_FOR_SHIPMENT' };
+        channel.sendToQueue('shipment_queue', Buffer.from(JSON.stringify(shipmentOrder)), { persistent: true });
+        console.log('Order sent to shipment queue');
 
-    // Send message to Payment Service via RabbitMQ
-    const orderBuffer = Buffer.from(JSON.stringify(order));
-    channel.sendToQueue('payment_queue', orderBuffer, { persistent: true });
-    console.log('Order sent to payment queue');
-
-    res.status(201).json({ message: 'Order placed successfully', orderId: order.id });
-  } catch (err) {
-    console.error('Error placing order:', err);
-    res.status(500).json({ error: 'Failed to place order' });
-  }
+        res.status(201).json({ message: 'Order placed successfully', orderId: order.id });
+    } catch (err) {
+        console.error('Error placing order:', err);
+        res.status(500).json({ error: 'Failed to place order' });
+    }
 });
 
 // Get Order Status Endpoint

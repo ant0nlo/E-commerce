@@ -6,14 +6,14 @@ import ShopCategory from './pages/ShopCategory';
 import Product from './pages/Product';
 import Cart from './pages/Cart';
 import Payment from './pages/Payment';
-//import CheckoutPage from './components/checkoutPage/CheckoutPage'
+import Shipment from './pages/Shipment'
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute.jsx';
 import LoginSignup from './pages/LoginSignup';
 import Footer from './components/footer/Footer.jsx'
 import men_banner from './components/Assets/mens2.png'
 import women_banner from './components/Assets/womens3.png'
 import kid_banner from './components/Assets/kids2.png'
-
 
 function App() {
   return (
@@ -26,18 +26,11 @@ function App() {
         <Route path='/womens' element={<ShopCategory banner={women_banner} category='women' />} />
         <Route path='/kids' element={<ShopCategory banner={kid_banner} category='kid'/>} />
         <Route path='/product/:productId' element={<Product />} />
-        <Route path='/cart' element={<Cart />} />
-
-          <Route 
-            path='/payment' 
-            element={
-              <ProtectedRoute>
-                <Payment />
-              </ProtectedRoute>
-            } 
-          />
-          
         <Route path='/login' element={<LoginSignup />} />
+        <Route path='/cart' element={<Cart />} />
+        <Route path='/payment' element={<ProtectedRoute> <Payment /> </ProtectedRoute>}  />
+        <Route path='/shipment' element={<Shipment />}  />
+        <Route path='/order-confirmation' element={<OrderConfirmationPage />} />
       </Routes>
      <Footer />
     </BrowserRouter>

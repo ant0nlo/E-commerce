@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Клонирайте вашето репо
-                git 'https://github.com/your-repo.git'
+                git 'https://github.com/E-commerce'
             }
         }
 

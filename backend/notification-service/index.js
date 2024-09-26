@@ -28,7 +28,6 @@ async function connectRabbitMQ() {
     const connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
     await channel.assertQueue('notification_queue', { durable: true });
-    await channel.assertQueue('dead_letter_queue', { durable: true });
     console.log('Connected to RabbitMQ');
 
     // Start consuming messages

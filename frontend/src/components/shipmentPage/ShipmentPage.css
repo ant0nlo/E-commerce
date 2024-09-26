@@ -1,0 +1,77 @@
+.shipment-page {
+    max-width: 600px; /* Set a maximum width for the page */
+    margin: 0 auto; /* Center the page horizontally */
+    margin-top: 30px;
+    padding: 20px; /* Add padding around the container */
+    background-color: #ffffff; /* White background for contrast */
+    border-radius: 8px; /* Rounded corners for the container */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.shipment-page h1 {
+    text-align: center; /* Center the heading */
+    color: #333; /* Dark gray color for the heading */
+    margin-bottom: 20px; /* Space below the heading */
+    font-size: 2rem; /* Font size for heading */
+}
+
+.shipment-form {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Arrange items vertically */
+}
+
+.shipment-form label {
+    margin-bottom: 15px; /* Space below each label */
+    display: flex; /* Use flex for labels */
+    flex-direction: column; /* Stack label text and input */
+    font-weight: bold; /* Bold text for labels */
+    color: #555; /* Medium gray for labels */
+}
+
+.shipment-form input {
+    padding: 12px; /* Add padding for inputs */
+    margin-top: 5px; /* Space above the input */
+    font-size: 16px; /* Font size for input text */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 4px; /* Rounded corners for inputs */
+    transition: border-color 0.3s; /* Smooth transition for border color */
+}
+
+.shipment-form input:focus {
+    border-color: #0070f3; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+.shipment-form button {
+    padding: 12px; /* Add padding for button */
+    font-size: 18px; /* Font size for button text */
+    background-color: #0070f3; /* Primary button color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners for button */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth transition for hover effects */
+}
+
+.shipment-form button:hover {
+    background-color: #005bb5; /* Darker blue on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+@media (max-width: 600px) {
+    .shipment-page {
+        padding: 15px; /* Adjust padding for smaller screens */
+    }
+
+    .shipment-form button {
+        font-size: 16px; /* Smaller font size for buttons on mobile */
+    }
+
+    .shipment-form input {
+        font-size: 14px; /* Smaller font size for inputs on mobile */
+    }
+
+    .shipment-page h1 {
+        font-size: 1.5rem; /* Smaller heading size for mobile */
+    }
+}

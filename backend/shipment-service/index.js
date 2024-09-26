@@ -1,16 +1,19 @@
 require('dotenv').config();
 const amqp = require('amqplib');
 const { MongoClient } = require('mongodb');
+const express = require('express');
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
 const MONGODB_URI = process.env.MONGODB_URI;
 const PORT = process.env.SHIPMENT_SERVICE_PORT || 5002;
 
+const app = express();
+
 // MongoDB Connection
 let db;
 MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
   .then((client) => {
-    db = client.db('orderdb');
+    db = client.db('e-comm-api-db');
     console.log('Connected to MongoDB');
   })
   .catch((err) => console.error('Failed to connect to MongoDB', err));
@@ -22,7 +25,7 @@ async function connectRabbitMQ() {
     const connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
     await channel.assertQueue('shipment_queue', { durable: true });
-    await channel.assertQueue('dead_letter_queue', { durable: true });
+    await channel.assertQueue('notification_queue', { durable: true });
     console.log('Connected to RabbitMQ');
 
     // Start consuming messages
@@ -66,9 +69,6 @@ async function processShipment(msg) {
 }
 
 // Health Check Endpoint
-const express = require('express');
-const app = express();
-
 app.get('/health', (req, res) => {
   res.status(200).send('Shipment Service is healthy');
 });
