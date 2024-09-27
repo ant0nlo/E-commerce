@@ -40,7 +40,7 @@ const PaymentPage = () => {
 
                     try {
                         // Изпращане на потвърждение за плащане към Payment Service
-                        const response = await axios.post('http://localhost:5001/api/payment/confirm', {
+                        const response = await axios.post('https://e-commerce-payment-service.onrender.com/api/payment/confirm', {
                             orderId: paymentResult.id, // Идентификаторът от PayPal
                             paymentResult: {
                                 ...paymentResult,
