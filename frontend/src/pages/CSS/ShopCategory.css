@@ -3,7 +3,10 @@
 .shopcategory-banner {
     display: block;
     margin: 50px auto;
-    width: 82%;
+    width: 1000px;
+    max-width: 82%; /* Максимална ширина, като процент от контейнера */
+    height: auto; /* Автоматично коригира височината спрямо пропорциите на изображението */
+    flex-wrap: wrap; /* Позволява пренареждане на елементите при по-малки екрани */
 }
 
 .shopcategory-indexSort {
@@ -22,6 +25,8 @@
     margin-right: 10px;
     background-color: #fff;
     position: relative;
+    margin: 10px 0; /* Добавено, за да се осигури отстояние при подредба на мобилни устройства */
+    width: 200px; /* Запазва фиксирана ширина на сортиращото меню */
 }
 
 .shopcategory-sort select {
@@ -40,9 +45,8 @@
     pointer-events: none; /* Иконата не пречи на кликовете */
 }
 
-.shopcategory-indexSort p span {
-    font-weight: 600;
-    margin-left: 5px; /* Коригирано разстояние */
+.shopcategory-indexSort p{
+    margin-right: 5px; /* Коригирано разстояние */
 }
 
 .shopcategory-products {
@@ -94,4 +98,53 @@
     background: #f0f0f0;
     color: #aaa;
     cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .shopcategory-indexSort {
+        flex-direction: column;
+        align-items: flex-start; /* Подравнява елементите отляво за по-добра видимост */
+        margin: 20px;
+    }
+
+    .shopcategory-indexSort p {
+        font-size: 14px; /* Намаляване на шрифта за по-малки екрани */
+        margin-left: 15px;
+        margin: 10px auto;
+
+    }
+
+    .shopcategory-sort {
+        width: 80%; /* Сортиращото меню да заема цялата ширина на родителя */
+        justify-content: space-between; /* Осигурява повече пространство между текст и икона */
+        padding: 8px 16px; /* Намаляване на padding за мобилни устройства */
+        margin-top: 10px;
+        margin-left: 15px;
+        margin: 10px auto;
+
+    }
+
+    .shopcategory-sort select {
+        font-size: 14px; /* Намаляване на шрифта за селектора */
+    }
+
+    .shopcategory-sort img {
+        right: 8px; /* Корекция на позицията на иконата */
+    }
+}
+
+/* За още по-малки екрани - смартфони */
+@media (max-width: 480px) {
+    .shopcategory-indexSort p {
+        font-size: 12px; /* Допълнително намаляване на шрифта */
+    }
+
+    .shopcategory-sort {
+        padding: 6px 12px; /* Още по-малко отстояние за компактен вид */
+        font-size: 12px; /* Допълнително намаляване на шрифта */
+    }
+
+    .shopcategory-sort img {
+        right: 6px; /* Още по-близо до ръба */
+    }
 }

@@ -3,7 +3,7 @@
     height: 400px;
     min-height: 200px;
     display: flex;
-    margin: 10px 30px -10px 125px;
+    margin: 10px auto;
     margin-bottom: -50px;
     padding: 20px;
     background: linear-gradient(180deg, #f6cc84 0%, #e1ffea22 60%);

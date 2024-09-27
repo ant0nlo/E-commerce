@@ -1,5 +1,5 @@
 .hero {
-    height: 100vh;
+    height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -14,14 +14,15 @@
     justify-content: center;
     flex-direction: column;
     text-align: center;
+    margin-bottom: 100px;
+    margin-top: 30px;
 }
 
 .banner {
-    width: 1050px;
-    max-width: 1200px;
-    height: 385px;
-    margin-top: -170px;
-    margin-bottom: -65px;
+    width: 1100px;
+    max-width: 90%;
+    height: auto;
+
 
 }
 
