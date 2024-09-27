@@ -9,7 +9,7 @@ const app = express();
 // CORS Configuration
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? 'https://e-comm-3ab.pages.dev/' // Заменете с реалния домейн на фронтенда
+    ? 'https://e-comm-3ab.pages.dev' // Заменете с реалния домейн на фронтенда
     : `http://localhost:3000`, // За разработка
   credentials: true,
 };
@@ -31,6 +31,20 @@ MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
     console.log('Connected to MongoDB in Payment Service');
   })
   .catch((err) => console.error('Failed to connect to MongoDB', err));
+
+  let channel;
+  async function connectRabbitMQ() {
+    try {
+      const connection = await amqp.connect(process.env.RABBITMQ_URL);
+      channel = await connection.createChannel();
+      await channel.assertQueue('shipment_queue', { durable: true });
+      console.log('Connected to RabbitMQ in Payment Service');
+    } catch (error) {
+      console.error('Failed to connect to RabbitMQ:', error);
+    }
+  }
+  
+  connectRabbitMQ();
 
 // Function to get PayPal access token
 async function getPayPalAccessToken() {
