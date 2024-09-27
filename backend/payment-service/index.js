@@ -40,6 +40,7 @@ async function connectRabbitMQ() {
   try {
     const connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
+    await channel.assertQueue('shipment_queue', { durable: true });
     await channel.assertQueue('payment_queue', { durable: true });
     console.log('Connected to RabbitMQ in Payment Service');
   } catch (error) {
