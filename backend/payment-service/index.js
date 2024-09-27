@@ -26,22 +26,25 @@ MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
   })
   .catch((err) => console.error('Failed to connect to MongoDB', err));
 
-// RabbitMQ Connection
 let channel;
+
 async function connectRabbitMQ() {
   try {
     const connection = await amqp.connect(RABBITMQ_URL);
+    console.log('RabbitMQ connection established.');
+    
     channel = await connection.createChannel();
+    console.log('RabbitMQ channel created successfully.');
+    
     await channel.assertQueue('payment_queue', { durable: true });
-    await channel.assertQueue('dead_letter_queue', { durable: true });
-    console.log('Connected to RabbitMQ');
-
-    // Start consuming messages
-    channel.consume('payment_queue', processPayment, { noAck: false });
-  } catch (err) {
-    console.error('Failed to connect to RabbitMQ', err);
+    console.log('Payment queue asserted.');
+    
+  } catch (error) {
+    console.error('Failed to connect to RabbitMQ:', error);
   }
 }
+
+// Call the connect function
 connectRabbitMQ();
 
 // Function to get PayPal access token
