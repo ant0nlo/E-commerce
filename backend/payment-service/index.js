@@ -35,7 +35,8 @@ async function connectRabbitMQ() {
     
     channel = await connection.createChannel();
     console.log('RabbitMQ channel created successfully.');
-    
+
+    await channel.assertQueue('shipment_queue', { durable: true });
     await channel.assertQueue('payment_queue', { durable: true });
     console.log('Payment queue asserted.');
     
