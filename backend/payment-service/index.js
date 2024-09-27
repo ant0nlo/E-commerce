@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors'); 
 const { MongoClient } = require('mongodb');
 const axios = require('axios');
+const amqp = require('amqplib');
 
 const app = express();
 
@@ -10,7 +11,7 @@ const app = express();
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? 'https://e-comm-3ab.pages.dev' // Заменете с реалния домейн на фронтенда
-    : `http://localhost:3000`, // За разработка
+    : 'http://localhost:3000', // За разработка
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -22,8 +23,9 @@ const PAYPAL_SECRET = process.env.PAYPAL_SECRET;
 const PAYPAL_API = process.env.PAYPAL_API || 'https://api-m.sandbox.paypal.com';
 const PORT = process.env.PAYMENT_SERVICE_PORT || 5001;
 const ORDER_SERVICE_URL = process.env.ORDER_SERVICE_URL || 'http://localhost:3001/create-order';
+const RABBITMQ_URL = process.env.RABBITMQ_URL;
 
-// MongoDB Connection (ако е необходимо)
+// MongoDB Connection
 let db;
 MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
   .then((client) => {
@@ -32,19 +34,19 @@ MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
   })
   .catch((err) => console.error('Failed to connect to MongoDB', err));
 
-  let channel;
-  async function connectRabbitMQ() {
-    try {
-      const connection = await amqp.connect(process.env.RABBITMQ_URL);
-      channel = await connection.createChannel();
-      await channel.assertQueue('shipment_queue', { durable: true });
-      console.log('Connected to RabbitMQ in Payment Service');
-    } catch (error) {
-      console.error('Failed to connect to RabbitMQ:', error);
-    }
+// RabbitMQ Connection
+let channel;
+async function connectRabbitMQ() {
+  try {
+    const connection = await amqp.connect(RABBITMQ_URL);
+    channel = await connection.createChannel();
+    await channel.assertQueue('payment_queue', { durable: true });
+    console.log('Connected to RabbitMQ in Payment Service');
+  } catch (error) {
+    console.error('Failed to connect to RabbitMQ:', error);
   }
-  
-  connectRabbitMQ();
+}
+connectRabbitMQ();
 
 // Function to get PayPal access token
 async function getPayPalAccessToken() {
@@ -68,17 +70,15 @@ async function getPayPalAccessToken() {
 app.post('/api/payment/confirm', async (req, res) => {
   const { orderId, paymentResult, shipmentInfo } = req.body;
   console.log('Received payment confirmation:', req.body);
-  
+
   if (!orderId || !paymentResult || !shipmentInfo) {
     return res.status(400).json({ success: false, error: 'Missing orderId, paymentResult, or shipmentInfo' });
   }
 
   try {
-    // Възможно е да искате да извършите допълнителна валидация на плащането с PayPal
-
     // Създаване на поръчка чрез Order Service
     const createOrderResponse = await axios.post(ORDER_SERVICE_URL, {
-      items: paymentResult.items, // Уверете се, че тези данни са налични
+      items: paymentResult.items,
       total: paymentResult.total,
       userEmail: paymentResult.userEmail,
       shipmentInfo: shipmentInfo,
@@ -87,6 +87,16 @@ app.post('/api/payment/confirm', async (req, res) => {
 
     if (createOrderResponse.status === 201) {
       console.log(`Order ${createOrderResponse.data.orderId} created successfully`);
+
+      // Изпращане на съобщение към payment_queue
+      const paymentOrder = { ...createOrderResponse.data, status: 'PAID' };
+      if (channel) {
+        channel.sendToQueue('payment_queue', Buffer.from(JSON.stringify(paymentOrder)), { persistent: true });
+        console.log('Order sent to payment queue from Payment Service');
+      } else {
+        console.error('RabbitMQ channel is not initialized in Payment Service');
+      }
+
       res.json({ success: true, orderId: createOrderResponse.data.orderId });
     } else {
       throw new Error('Failed to create order');
