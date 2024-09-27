@@ -11,7 +11,7 @@ const app = express();
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? 'https://e-commerce-8wzd.onrender.com' // Заменете с реалния домейн на фронтенда
-    : 'http://localhost:3000', // За разработка
+    : `http://localhost:3000`, // За разработка
   credentials: true,
 };
 app.use(cors(corsOptions));
