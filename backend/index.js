@@ -12,18 +12,13 @@ const app = express();
 require('dotenv').config(); 
 const PORT = process.env.PORT || 4000;
 const IP = process.env.IP; // Уверете се, че IP е дефинирано правилно
-/* 
-// CORS Configuration
-const corsOptions = {
-  origin: `http://${IP}:3000`, // Frontend origin
-  credentials: true, // Allow credentials (cookies, authorization headers)
-}; */
 
 const corsOptions = {
-  origin: 'https://e-comm-3ab.pages.dev', // Заменете с вашия фронтенд домейн
-  credentials: true, // Позволява удостоверяване (бисквитки, заглавия на удостоверяване)
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://e-commerce-8wzd.onrender.com'
+    : 'http://localhost:3000',
+  credentials: true,
 };
-
 app.use(cors(corsOptions));
 
 // Middleware
