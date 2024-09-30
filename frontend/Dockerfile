@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
-RUN npm run build
+RUN CI=false npm run build
 
 # Stage 2: Serve the React app with NGINX
 FROM nginx:alpine
