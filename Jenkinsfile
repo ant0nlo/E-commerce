@@ -159,7 +159,7 @@ pipeline {
                 script {
                     //commands to deploy your containers.
                     echo "Deploying all services to cloud"
-                    // sh 'kubectl apply -f k8s/deployment.yaml'
+                    sh 'kubectl apply -f k8s/deployment.yaml'
                 }
             }
         }
