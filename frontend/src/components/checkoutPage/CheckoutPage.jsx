@@ -1,32 +1,65 @@
 // frontend/components/CheckoutPage/CheckoutPage.jsx
 
-import React, { useState } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ShopContext } from '../../context/ShopContext';
 
 const CheckoutPage = () => {
-    const [cart, setCart] = useState([]); // Fetch cart items from state or context
-    const [total, setTotal] = useState(0); // Calculate total amount
     const navigate = useNavigate();
+    const { cartItems, getTotalCartAmount } = useContext(ShopContext);
+
+    const formattedCartItems = useMemo(() => (
+        Object.entries(cartItems)
+            .filter(([, quantity]) => quantity > 0)
+            .map(([key, quantity]) => {
+                const [productId, size] = key.split('-');
+                return {
+                    productId: Number(productId),
+                    size: (size || '').toUpperCase(),
+                    quantity,
+                };
+            })
+    ), [cartItems]);
+
+    const total = useMemo(() => getTotalCartAmount(), [cartItems, getTotalCartAmount]);
 
     const handlePlaceOrder = async () => {
         try {
-            const response = await fetch('/api/order', {
+            if (formattedCartItems.length === 0) {
+                alert('Your cart is empty.');
+                return;
+            }
+
+            const emailResponse = await fetch('http://localhost:4000/getUserEmail', {
+                method: 'GET',
+                headers: {
+                    'auth-token': localStorage.getItem('auth-token'),
+                },
+            });
+
+            const emailData = await emailResponse.json();
+
+            if (!emailResponse.ok || !emailData.email) {
+                alert('Failed to fetch user details. Please log in again.');
+                return;
+            }
+
+            const response = await fetch('http://localhost:4000/order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
                 body: JSON.stringify({
-                    items: cart,
+                    items: formattedCartItems,
                     total: total,
-                    userEmail: 'user@example.com' // Replace with actual user email
+                    userEmail: emailData.email
                 })
             });
 
             const result = await response.json();
-            if (result.orderId) {
+            if (response.ok && result.orderId) {
                 // Redirect to Payment Page with orderId and totalAmount
-                navigate.push('/payment', { orderId: result.orderId, totalAmount: total });
+                navigate('/payment', { state: { orderId: result.orderId, totalAmount: total } });
             } else {
                 alert('Failed to place order. Please try again.');
             }
@@ -45,4 +78,4 @@ const CheckoutPage = () => {
     );
 };
 
-export default CheckoutPage;    
+export default CheckoutPage;

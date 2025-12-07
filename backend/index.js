@@ -6,11 +6,17 @@ const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');  
 const bcrypt = require('bcrypt'); // Password hashing
-const amqp = require('amqplib'); // RabbitMQ
 const { v4: uuidv4 } = require('uuid'); // UUID for unique IDs
 const app = express();
-require('dotenv').config(); 
+require('dotenv').config();
 const PORT = process.env.PORT || 4000;
+
+const { MONGO_URI, JWT_SECRET } = process.env;
+
+if (!MONGO_URI) {
+  console.error('Missing required environment variable: MONGO_URI');
+  process.exit(1);
+}
 
 // CORS Configuration
 const corsOptions = {
@@ -25,16 +31,22 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB Connection with Updated Options
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
- .then(() => console.log('MongoDB connected'))
- .catch(err => console.log(err));
+const connectToDatabase = async () => {
+  try {
+    await mongoose.connect(MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error('Failed to connect to MongoDB', err);
+    process.exit(1);
+  }
+};
 
 // Root Endpoint
 app.get('/', (req, res) => {
-  res.send('Successfully connected...')
+  res.send('Successfully connected...');
 });
 
 // Image Storage Engine
@@ -94,6 +106,27 @@ const Item = mongoose.model('Item', {
     default: true,
   },
 });
+
+const orderItemSchema = new mongoose.Schema(
+  {
+    productId: { type: Number, required: true },
+    size: { type: String, required: true },
+    quantity: { type: Number, required: true, min: 1 },
+  },
+  { _id: false }
+);
+
+const Order = mongoose.model(
+  'Order',
+  new mongoose.Schema({
+    id: { type: String, default: uuidv4, unique: true },
+    items: { type: [orderItemSchema], default: [] },
+    total: { type: Number, required: true, min: 0 },
+    userEmail: { type: String, required: true, lowercase: true, trim: true },
+    status: { type: String, enum: ['PENDING', 'PAID', 'FAILED'], default: 'PENDING' },
+    createdAt: { type: Date, default: Date.now },
+  })
+);
 
 // Add Product Endpoint
 app.post('/addproduct', async (req, res) => {
@@ -237,7 +270,7 @@ app.post('/signup', async (req, res) => {
         id: user._id
       }
     };
-    const token = jwt.sign(data, process.env.JWT_SECRET || 'secret_ecom', { expiresIn: '1h' });
+    const token = jwt.sign(data, JWT_SECRET || 'secret_ecom', { expiresIn: '1h' });
     res.json({success:true, token});
   } catch (error) {
     console.error("Signup error:", error);
@@ -269,10 +302,10 @@ app.post('/login', async (req, res) => {
           id: user._id
         }
       };
-      const token = jwt.sign(data, process.env.JWT_SECRET || 'secret_ecom', { expiresIn: '1h' });
+      const token = jwt.sign(data, JWT_SECRET || 'secret_ecom', { expiresIn: '1h' });
       res.json({success:true, token});
     } else {
-      res.status(401).json({ success: false, error: "Invalid credentials" });
+      res.status(401).json({ success: false, error: "Invalid password" });
     }
   } catch (error) {
     console.error("Login error:", error);
@@ -311,9 +344,9 @@ const fetchUser = async (req, res, next) => {
   const token = req.header('auth-token');
   if (!token) {
     return res.status(401).send({errors:"Please authenticate using valid token"});
-  } 
+  }
   try {
-    const data = jwt.verify(token, process.env.JWT_SECRET || 'secret_ecom');
+    const data = jwt.verify(token, JWT_SECRET || 'secret_ecom');
     req.user = data.user;
     next();
   } catch (error) {
@@ -414,10 +447,9 @@ app.post('/getcart', fetchUser, async (req, res) => {
     console.log("Get Cart");
     let userData = await Users.findById(req.user.id);
     if (!userData) {
-      res.status(404).send({ errors: "User not found" });
-    } else {
-      res.json(Object.fromEntries(userData.cartData)); // Convert Map to Object
+      return res.status(404).send({ errors: "User not found" });
     }
+    res.json(Object.fromEntries(userData.cartData)); // Convert Map to Object
   } catch (error) {
     console.error("Error getting cart:", error);
     res.status(500).send({ errors: "Failed to get cart" });
@@ -469,54 +501,56 @@ app.post('/order', async (req, res) => {
 app.post('/order', async (req, res) => {
   const { items, total, userEmail } = req.body;
 
-  // Validate input data
-  if (!items || !userEmail) {
-      return res.status(400).json({ error: 'Missing required fields' });
+  if (!Array.isArray(items) || items.length === 0 || !userEmail) {
+    return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const order = {
-      id: uuidv4(),
-      items,
-      total,
-      userEmail,
-      status: 'PENDING'
-  };
+  const validSizes = ['S', 'M', 'L', 'XL', 'XXL'];
+
+  const normalizedItems = items.map((item) => ({
+    productId: Number(item.productId),
+    size: String(item.size || '').toUpperCase(),
+    quantity: Number(item.quantity) || 0,
+  })).filter((item) => item.productId && validSizes.includes(item.size) && item.quantity > 0);
+
+  if (normalizedItems.length === 0) {
+    return res.status(400).json({ error: 'No valid order items supplied' });
+  }
 
   try {
-      // Save order to MongoDB
-      await db.collection('orders').insertOne(order);
-      console.log('Order saved:', order.id);
+    const order = new Order({
+      items: normalizedItems,
+      total,
+      userEmail,
+    });
 
-      // Send message to Payment Processing Service via RabbitMQ
-      if (channel) {
-          const orderBuffer = Buffer.from(JSON.stringify(order));
-          channel.sendToQueue('payment_queue', orderBuffer, { persistent: true });
-          console.log('Order sent to payment queue');
-      } else {
-          console.error('RabbitMQ channel not available');
-          // Optionally handle this case (e.g., retry logic)
-      }
+    const savedOrder = await order.save();
 
-      res.status(201).json({ message: 'Order placed successfully', orderId: order.id });
-      // Remove frontend redirection from backend
-      // window.location.href = '/order-confirmation'; // ❌ Remove this line
+    res.status(201).json({ message: 'Order placed successfully', orderId: savedOrder.id });
   } catch (err) {
-      console.error('Error placing order:', err);
-      res.status(500).json({ error: 'Failed to place order' });
+    console.error('Error placing order:', err);
+    res.status(500).json({ error: 'Failed to place order' });
   }
 });
 // Get User Email Endpoint
 app.get('/getUserEmail', fetchUser, async (req, res) => {
   try {
       const user = await Users.findById(req.user.id); // Adjust as per your logic
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
       res.status(200).json({ email: user.email });
   } catch (err) {
       console.error('Error fetching user email:', err);
       res.status(500).json({ error: 'Failed to fetch user email' });
   }
 });
+// Start the Server once the database is ready
+const startServer = async () => {
+  await connectToDatabase();
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+};
 
-// Start the Server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+startServer();
